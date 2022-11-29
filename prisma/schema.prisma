@@ -1,0 +1,97 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+    id String @id @default(uuid())
+    firstname String
+    lastname String
+    email String
+    phone String
+    password String
+    companyName String
+    siret String
+    ape String
+    address String
+    bankAccountOwner String
+    bankDomiciliation String
+    bankRib String
+    bankIban String
+    bankBic String
+    createdAt DateTime @default(now()) @db.Date
+}
+
+model OrganizationType {
+    id String @id @default(uuid())
+    name String
+    color String
+    Organization Organization[]
+    createdAt DateTime @default(now()) @db.Date
+}
+
+model Organization {
+    id String @id @default(uuid())
+    slug String @unique
+    name String
+    reference String
+    email String
+    phone String
+    address String
+    siret String
+    organizationTypeId String
+    OrganizationType OrganizationType @relation(fields: [organizationTypeId], references: [id])
+    Mission Mission[]
+    Contribution Contribution[]
+    createdAt DateTime @default(now()) @db.Date
+}
+
+model Mission {
+    id String @id @default(uuid())
+    reference String
+    title String
+    comment String?
+    deposit Int
+    organizationId String
+    Organization Organization @relation(fields: [organizationId], references: [id])
+    MissionLine MissionLine[]
+    billedAt DateTime? @db.Date
+    createdAt DateTime @default(now()) @db.Date
+}
+
+model MissionLine {
+    id String @id @default(uuid())
+    title String
+    quantity Int
+    price Int
+    unit String
+    missionId String
+    Mission Mission @relation(fields: [missionId], references: [id])
+    createdAt DateTime @default(now()) @db.Date
+}
+
+model Contribution {
+    id String @id @default(uuid())
+    title String
+    comment String?
+    price Int
+    organizationId String
+    Organization Organization @relation(fields: [organizationId], references: [id])
+    createdAt DateTime @default(now()) @db.Date
+}
+
+model Transaction {
+    id String @id @default(uuid())
+    sourceType String
+    sourceId String
+    price Int
+    paidAt DateTime? @db.Date
+    createdAt DateTime @default(now()) @db.Date
+}
