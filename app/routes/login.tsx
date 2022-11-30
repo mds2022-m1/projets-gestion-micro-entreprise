@@ -1,3 +1,14 @@
+import { Form } from '@remix-run/react';
+import React from 'react';
+import type { LoaderFunction } from '@remix-run/node';
+import { authenticator } from '~/server/auth.server';
+
+// eslint-disable-next-line max-len
+export const loader: LoaderFunction = async ({ request }) => {
+  const user = await authenticator.isAuthenticated(request, { successRedirect: '/' });
+  console.log(user);
+  return { user };
+};
 export default function Login() {
   return (
     <div className="flex min-h-screen">
@@ -11,9 +22,9 @@ export default function Login() {
             <div>
               <div>
                 <div className="mt-1 grid grid-cols-1 gap-3">
-                  <div>
-                    <a
-                      href="https://github.com/login"
+                  <Form action="/auth/github" method="post">
+                    <button
+                      type="submit"
                       className="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-500 shadow-sm hover:bg-gray-50"
                     >
                       <span className="mr-1.5">Sign in with GitHub</span>
@@ -24,8 +35,8 @@ export default function Login() {
                           clipRule="evenodd"
                         />
                       </svg>
-                    </a>
-                  </div>
+                    </button>
+                  </Form>
                 </div>
               </div>
             </div>
