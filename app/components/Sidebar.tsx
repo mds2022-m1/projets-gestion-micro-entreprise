@@ -10,7 +10,7 @@ const navigation = [
     name: 'Dashboard', href: '/', icon: Squares2X2Icon, current: true,
   },
   {
-    name: 'Organisations', href: '/organisations', icon: BuildingOffice2Icon, current: false,
+    name: 'Organisations', href: '/organizations', icon: BuildingOffice2Icon, current: false,
   },
   {
     name: 'Missions', href: '/missions', icon: ClipboardDocumentIcon, current: false,
