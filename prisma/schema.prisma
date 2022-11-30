@@ -14,9 +14,9 @@ model User {
     id String @id @default(uuid())
     firstname String
     lastname String
-    email String
+    email String @unique
     phone String
-    password String
+    password String?
     companyName String
     siret String
     ape String
@@ -26,6 +26,7 @@ model User {
     bankRib String
     bankIban String
     bankBic String
+    githubId String? @unique
     createdAt DateTime @default(now()) @db.Date
 }
 
