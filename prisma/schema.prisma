@@ -27,7 +27,7 @@ model User {
     bankIban String
     bankBic String
     githubId String? @unique
-    createdAt DateTime @default(now()) @db.Date
+    createdAt DateTime @default(now())
 }
 
 model OrganizationType {
@@ -35,12 +35,11 @@ model OrganizationType {
     name String
     color String
     Organization Organization[]
-    createdAt DateTime @default(now()) @db.Date
+    createdAt DateTime @default(now())
 }
 
 model Organization {
     id String @id @default(uuid())
-    slug String @unique
     name String
     reference String
     email String
@@ -51,7 +50,7 @@ model Organization {
     OrganizationType OrganizationType @relation(fields: [organizationTypeId], references: [id])
     Mission Mission[]
     Contribution Contribution[]
-    createdAt DateTime @default(now()) @db.Date
+    createdAt DateTime @default(now())
 }
 
 model Mission {
@@ -63,8 +62,8 @@ model Mission {
     organizationId String
     Organization Organization @relation(fields: [organizationId], references: [id])
     MissionLine MissionLine[]
-    billedAt DateTime? @db.Date
-    createdAt DateTime @default(now()) @db.Date
+    billedAt DateTime?
+    createdAt DateTime @default(now())
 }
 
 model MissionLine {
@@ -75,7 +74,7 @@ model MissionLine {
     unit String
     missionId String
     Mission Mission @relation(fields: [missionId], references: [id])
-    createdAt DateTime @default(now()) @db.Date
+    createdAt DateTime @default(now())
 }
 
 model Contribution {
@@ -85,7 +84,7 @@ model Contribution {
     price Int
     organizationId String
     Organization Organization @relation(fields: [organizationId], references: [id])
-    createdAt DateTime @default(now()) @db.Date
+    createdAt DateTime @default(now())
 }
 
 model Transaction {
@@ -93,6 +92,6 @@ model Transaction {
     sourceType String
     sourceId String
     price Int
-    paidAt DateTime? @db.Date
-    createdAt DateTime @default(now()) @db.Date
+    paidAt DateTime?
+    createdAt DateTime @default(now())
 }
