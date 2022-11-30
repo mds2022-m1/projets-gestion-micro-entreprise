@@ -27,6 +27,8 @@ model User {
     bankIban String
     bankBic String
     githubId String? @unique
+    OrganizationType OrganizationType[]
+    Organization Organization[]
     createdAt DateTime @default(now())
 }
 
@@ -35,6 +37,8 @@ model OrganizationType {
     name String
     color String
     Organization Organization[]
+    userId String
+    User User @relation(fields: [userId], references: [id])
     createdAt DateTime @default(now())
 }
 
@@ -48,6 +52,8 @@ model Organization {
     siret String
     organizationTypeId String
     OrganizationType OrganizationType @relation(fields: [organizationTypeId], references: [id])
+    userId String
+    User User @relation(fields: [userId], references: [id])
     Mission Mission[]
     Contribution Contribution[]
     createdAt DateTime @default(now())
