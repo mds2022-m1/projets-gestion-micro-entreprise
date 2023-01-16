@@ -12,6 +12,7 @@ export async function createOrganizationType(organizationTypeDTO: OrganizationTy
     data: {
       name: organizationTypeDTO.name,
       color: organizationTypeDTO.color,
+      userId: organizationTypeDTO.user.id,
     },
   });
 }
@@ -51,6 +52,7 @@ export async function createOrganization(organizationDTO: OrganizationDTO): Prom
       address: organizationDTO.address,
       siret: organizationDTO.siret,
       organizationTypeId: organizationDTO.organizationType.id,
+      userId: organizationDTO.user.id,
     },
   });
 }
