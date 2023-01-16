@@ -1,7 +1,26 @@
-import type { Organization, OrganizationType } from '@prisma/client';
+import type { Organization, OrganizationType, User } from '@prisma/client';
 import { db } from '~/utils/db.server';
 import type { OrganizationDTO, OrganizationTypeDTO } from '~/utils/types';
+import type { GitHubProfile } from 'remix-auth-socials';
 
+export const findOrCreateUserFromGithubProfile = async (profile: GitHubProfile): Promise<User> => {
+  console.log('profile', profile);
+  const user = await db.user.findUnique({
+    where: { githubId: profile.id },
+  });
+
+  if (user) return user;
+
+  return db.user.create({
+    data: {
+      // eslint-disable-next-line no-underscore-dangle
+      name: profile._json.name,
+      // eslint-disable-next-line no-underscore-dangle
+      email: profile.emails[0].value,
+      githubId: profile.id,
+    },
+  });
+};
 export async function getAllOrganizationType(): Promise<OrganizationType[]> {
   return db.organizationType.findMany();
 }
