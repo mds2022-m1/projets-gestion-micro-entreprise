@@ -1,18 +1,15 @@
-import { Fragment, useRef, useState } from 'react'
-import { Dialog, Transition } from '@headlessui/react'
+import { Fragment } from 'react';
+import { Dialog, Transition } from '@headlessui/react';
 
-export function ModalOrganizationType() {
-  const [open, setOpen] = useState(true)
+type ModalProps = {
+  state: boolean,
+  onClickCancel: Function
+};
 
-  const cancelButtonRef = useRef(null)
-
-  function saveTypeOrganisation() {
-    setOpen(false)
-  }
-
+export function ModalOrganizationType({ state, onClickCancel }: ModalProps) {
   return (
-    <Transition.Root show={open} as={Fragment}>
-      <Dialog as="div" className="relative z-10" initialFocus={cancelButtonRef} onClose={setOpen}>
+    <Transition.Root show={state} as={Fragment}>
+      <Dialog as="div" className="relative z-10" onClose={() => onClickCancel()}>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -40,18 +37,18 @@ export function ModalOrganizationType() {
                 <div>
                   <div className="mt-3 text-center sm:mt-3">
                     <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-gray-900">
-                      Type d'organisation
+                      Type d&apos;organisation
                     </Dialog.Title>
                     <div className="mt-2">
                       <form className="space-y-4 divide-y divide-gray-200">
-                        <input type="text" name="type_organisation" id="type_organisation" autoComplete="type_organisation" className="h-8 block w-full min-w-0 flex-1 rounded-none rounded-r-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm mt-3 border-2" placeholder="Nom"/>
+                        <input type="text" name="type_organisation" id="type_organisation" autoComplete="type_organisation" className="h-8 block w-full min-w-0 flex-1 rounded-none rounded-r-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm mt-3 border-2" placeholder="Nom" />
                       </form>
                     </div>
                   </div>
                 </div>
                 <div className="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
-                  <button type="button" className="inline-flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:col-start-2 sm:text-sm" onClick={() => saveTypeOrganisation()}>Enregistrer</button>
-                  <button type="button" className="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:col-start-1 sm:mt-0 sm:text-sm" onClick={() => setOpen(false)} ref={cancelButtonRef}>Fermer</button>
+                  <button type="button" className="inline-flex w-full justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:col-start-2 sm:text-sm" onClick={() => {}}>Enregistrer</button>
+                  <button type="button" className="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:col-start-1 sm:mt-0 sm:text-sm" onClick={() => onClickCancel()}>Fermer</button>
                 </div>
               </Dialog.Panel>
             </Transition.Child>
@@ -59,5 +56,5 @@ export function ModalOrganizationType() {
         </div>
       </Dialog>
     </Transition.Root>
-  )
+  );
 }
