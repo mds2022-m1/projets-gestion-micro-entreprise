@@ -14,7 +14,7 @@ export const findOrCreateUserFromGithubProfile = async (profile: GitHubProfile):
   return db.user.create({
     data: {
       // eslint-disable-next-line no-underscore-dangle
-      name: profile._json.name,
+      name: profile._json.name ?? profile.displayName,
       // eslint-disable-next-line no-underscore-dangle
       email: profile.emails[0].value,
       githubId: profile.id,
