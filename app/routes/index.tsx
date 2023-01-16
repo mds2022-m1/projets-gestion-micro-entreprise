@@ -1,5 +1,16 @@
 import React, { useState } from 'react';
+import type { LoaderFunction } from '@remix-run/node';
+import { authenticator } from '~/server/auth.server';
 import { ModalOrganizationType } from '../components/ModalOrganizationType';
+
+export const loader: LoaderFunction = async ({ request }) => {
+  const user = await authenticator.isAuthenticated(request, {
+    failureRedirect: '/login',
+  });
+
+  console.log('index', user);
+  return { user };
+};
 
 export default function Index() {
   const [showModal, setShowModal] = useState(false);
