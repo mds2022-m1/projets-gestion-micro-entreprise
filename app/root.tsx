@@ -5,7 +5,8 @@ import {
   Meta,
   Outlet,
   Scripts,
-  ScrollRestoration,
+  // eslint-disable-next-line @typescript-eslint/comma-dangle
+  ScrollRestoration
 } from '@remix-run/react';
 import { Sidebar } from './components/Sidebar';
 import styles from './tailwind.css';
@@ -20,6 +21,7 @@ export const meta: MetaFunction = () => ({
   viewport: 'width=device-width,initial-scale=1',
 });
 
+// eslint-disable-next-line import/no-default-export
 export default function App() {
   return (
     <html lang="en">

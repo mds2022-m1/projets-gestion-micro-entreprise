@@ -1,9 +1,10 @@
-import type { OrganizationType } from '@prisma/client';
+import type { OrganizationType, User } from '@prisma/client';
 
 export type OrganizationTypeDTO = {
   id?: string,
   name: string,
-  color: string
+  color: string,
+  user: User
 };
 
 export type OrganizationDTO = {
@@ -14,5 +15,6 @@ export type OrganizationDTO = {
   phone: string,
   address: string,
   siret: string,
-  organizationType: OrganizationType
+  organizationType: OrganizationType,
+  user: User
 };
