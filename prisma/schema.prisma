@@ -12,21 +12,20 @@ datasource db {
 
 model User {
     id String @id @default(uuid())
-    firstname String
-    lastname String
-    email String @unique
-    phone String
+    name String
+    email String?
+    phone String?
     password String?
-    companyName String
-    siret String
-    ape String
-    address String
-    bankAccountOwner String
-    bankDomiciliation String
-    bankRib String
-    bankIban String
-    bankBic String
-    githubId String? @unique
+    companyName String?
+    siret String?
+    ape String?
+    address String?
+    bankAccountOwner String?
+    bankDomiciliation String?
+    bankRib String?
+    bankIban String?
+    bankBic String?
+    githubId String @unique
     createdAt DateTime @default(now()) @db.Date
 }
 
@@ -40,7 +39,6 @@ model OrganizationType {
 
 model Organization {
     id String @id @default(uuid())
-    slug String @unique
     name String
     reference String
     email String

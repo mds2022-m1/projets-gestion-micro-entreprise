@@ -1,21 +1,31 @@
 // ./app/routes/index.tsx
-import type { Organization } from '@prisma/client';
-import { json } from '@remix-run/node';
-import { useLoaderData } from '@remix-run/react';
-import { getAllOrganizations } from '~/utils/repository';
+import { Form, useLoaderData } from '@remix-run/react';
+import type { LoaderFunction } from '@remix-run/node';
+import { authenticator } from '~/server/auth.server';
 
-export const loader = async () => {
-  const organizations = await getAllOrganizations();
+export const loader: LoaderFunction = async ({ request }) => {
+  const user = await authenticator.isAuthenticated(request, {
+    failureRedirect: '/login',
+  });
 
-  return json(organizations);
+  console.log('index', user);
+  return { user };
 };
 
 export default function Index() {
-  const organizations = useLoaderData<Organization[]>();
+  const { user } = useLoaderData();
   return (
     <div className="lg:ml-64 h-screen bg-slate-700 flex flex-col justify-center items-center">
       <h2 className="text-blue-600 font-extrabold text-5xl">TailwindCSS Is Working!</h2>
-      {organizations.map((organization) => (<div>{organization.name}</div>))}
+      <p>
+        Hello
+        {' '}
+        {' '}
+        {user.name}
+      </p>
+      <Form action="/logout" method="post">
+        <button type="submit">Logout</button>
+      </Form>
     </div>
   );
 }
