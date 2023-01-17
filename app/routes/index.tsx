@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import type { LoaderFunction } from '@remix-run/node';
 import { authenticator } from '~/server/auth.server';
 

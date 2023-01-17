@@ -1,25 +1,11 @@
 import { Dialog, Transition } from '@headlessui/react';
 import {
   ArrowLeftOnRectangleIcon, Bars3CenterLeftIcon, BuildingOffice2Icon, ClipboardDocumentIcon,
+  // eslint-disable-next-line @typescript-eslint/comma-dangle
   Squares2X2Icon, UserIcon, XMarkIcon
 } from '@heroicons/react/24/outline';
+import { useLocation } from '@remix-run/react';
 import { Fragment, useState } from 'react';
-
-const navigation = [
-  {
-    name: 'Dashboard', href: '/', icon: Squares2X2Icon, current: true,
-  },
-  {
-    name: 'Organisations', href: '/organizations', icon: BuildingOffice2Icon, current: false,
-  },
-  {
-    name: 'Missions', href: '/missions', icon: ClipboardDocumentIcon, current: false,
-  },
-];
-const secondaryNavigation = [
-  { name: 'Compte', href: '/account', icon: UserIcon },
-  { name: 'Déconnexion', href: '#', icon: ArrowLeftOnRectangleIcon },
-];
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ');
@@ -27,6 +13,25 @@ function classNames(...classes: string[]) {
 
 export function Sidebar() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const location = useLocation();
+
+  const navigation = [
+    {
+      name: 'Dashboard', href: '/', icon: Squares2X2Icon, current: location.pathname === '/',
+    },
+    {
+      name: 'Organisations', href: '/organizations', icon: BuildingOffice2Icon, current: location.pathname.includes('/organizations'),
+    },
+    {
+      name: 'Missions', href: '/missions', icon: ClipboardDocumentIcon, current: location.pathname.includes('/missions'),
+    },
+  ];
+  const secondaryNavigation = [
+    { name: 'Compte', href: '/account', icon: UserIcon },
+    { name: 'Déconnexion', href: '/logout', icon: ArrowLeftOnRectangleIcon },
+  ];
+
   return (
     <div className="min-h-full">
       <Transition.Root show={sidebarOpen} as={Fragment}>
