@@ -1,6 +1,6 @@
 // ./app/routes/index.tsx
 import { Form, useLoaderData } from '@remix-run/react';
-import type { LoaderFunction, ActionFunction } from '@remix-run/node';
+import type { LoaderFunction } from '@remix-run/node';
 import { authenticator } from '~/server/auth.server';
 
 export const loader: LoaderFunction = async ({ request }) => {
@@ -8,10 +8,9 @@ export const loader: LoaderFunction = async ({ request }) => {
     failureRedirect: '/login',
   });
 
+  console.log('index', user);
   return { user };
 };
-
-export const action: ActionFunction = async ({ request }) => authenticator.logout(request, { redirectTo: '/login' });
 
 export default function Index() {
   const { user } = useLoaderData();
@@ -22,9 +21,9 @@ export default function Index() {
         Hello
         {' '}
         {' '}
-        {user.displayName}
+        {user.name}
       </p>
-      <Form method="post">
+      <Form action="/logout" method="post">
         <button type="submit">Logout</button>
       </Form>
     </div>
