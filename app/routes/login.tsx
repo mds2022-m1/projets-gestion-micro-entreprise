@@ -15,8 +15,45 @@ export default function Login() {
       <div className="flex flex-1 flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
         <div className="mx-auto w-full max-w-sm lg:w-96">
           <div className="flex justify-center">
-            <h2 className="mt-6 text-3xl font-bold tracking-tight text-gray-900">GME</h2>
+            <h2 className="mt-6 text-3xl font-bold tracking-tight text-gray-900">GME login</h2>
           </div>
+          <form action="get" className="px-8 pt-6 pb-8 mb-4">    
+            <div className="mb-4">                
+              <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">
+                Email
+              </label>
+              <input
+              type="text"
+              name="email"
+              id="email"
+              autoComplete="email"
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              placeholder='exemple@gmail.com'
+              />
+            </div>
+            <div className="mb-6">
+              <label htmlFor="password" className="block text-gray-700 text-sm font-bold mb-2">
+                Password
+              </label>
+                <input
+                type="text"
+                name="password"
+                id="password"
+                autoComplete="password"
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                placeholder='********'
+                />
+            </div>
+            <div className="flex items-center justify-between">
+              <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+                Sign In
+              </button>
+              <a className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800" href="/register">
+                Not register ?
+              </a>
+            </div>
+          </form>
+          <hr></hr>
 
           <div className="mt-8">
             <div>
