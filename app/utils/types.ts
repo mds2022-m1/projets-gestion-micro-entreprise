@@ -12,5 +12,5 @@ export type UserDTO = {
   bankRib?: string,
   bankIban?: string,
   bankBic?: string,
-  githubId: string
+  githubId?: string
 };

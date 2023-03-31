@@ -11,23 +11,24 @@ datasource db {
 }
 
 model User {
-    id String @id @default(uuid())
-    name String
-    email String?
-    phone String?
-    password String?
-    companyName String?
-    siret String?
-    ape String?
-    address String?
-    bankAccountOwner String?
-    bankDomiciliation String?
-    bankRib String?
-    bankIban String?
-    bankBic String?
-    githubId String @unique
-    createdAt DateTime @default(now()) @db.Date
+  id String @id @default(uuid())
+  name String
+  email String?
+  phone String?
+  password String?
+  companyName String?
+  siret String?
+  ape String?
+  address String?
+  bankAccountOwner String?
+  bankDomiciliation String?
+  bankRib String?
+  bankIban String?
+  bankBic String?
+  githubId String?
+  createdAt DateTime @default(now()) @db.Date
 }
+
 
 model OrganizationType {
     id String @id @default(uuid())

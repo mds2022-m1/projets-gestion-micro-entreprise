@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { ActionFunction, LoaderFunction } from '@remix-run/node';
 import { authenticator } from '~/server/auth.server';
 import { json, type ActionArgs, type LoaderArgs } from '@remix-run/node'
@@ -26,11 +26,6 @@ export let action: ActionFunction = async ({request}) => {
   let lastname = formData.get('lastname')?.toString()
   let password = formData.get('password')?.toString()
   let repeatpassword = formData.get('repeat-password')?.toString()
-
-  // On vérifie que les deux mots de passe sont identiques
-  if (password !== repeatpassword) {
-    return json({ error: 'Les mots de passe ne sont pas identiques' }, { status: 400 })
-  }else{
     let formObj = Object.fromEntries(formData.entries())
     const hashedPassword = hashPassword(password);
     console.table(formObj)
@@ -49,16 +44,13 @@ export let action: ActionFunction = async ({request}) => {
         bankRib: null,
         bankIban: null,
         bankBic: null,
-        githubId: null,
+        githubId: "null",
         createdAt: new Date(),
       },
     };
     
     await prisma.user.create(data);
   }
-
-  
-}
 
 function hashPassword(password: string | undefined): string | undefined {
   const saltRounds = 10;
@@ -70,6 +62,11 @@ function hashPassword(password: string | undefined): string | undefined {
 }
 
 export default function Register() {
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleTogglePassword = () => {
+    setShowPassword(!showPassword);
+  };
   return (
     <div className="flex min-h-screen">
       <div className="flex flex-1 flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
@@ -93,7 +90,7 @@ export default function Register() {
             </div>
             <div className="mb-4">                
               <label htmlFor="phone" className="block text-gray-700 text-sm font-bold mb-2">
-                Phone
+                Téléphone
               </label>
               <input
               type="text"
@@ -106,7 +103,7 @@ export default function Register() {
             </div>
             <div className="mb-4">                
               <label htmlFor="firstname" className="block text-gray-700 text-sm font-bold mb-2">
-                Firstname
+                Prénom
               </label>
               <input
               type="text"
@@ -119,7 +116,7 @@ export default function Register() {
             </div>
             <div className="mb-4">                
               <label htmlFor="lastname" className="block text-gray-700 text-sm font-bold mb-2">
-                Lastname
+                Nom
               </label>
               <input
               type="text"
@@ -132,10 +129,10 @@ export default function Register() {
             </div>
             <div className="mb-6">
               <label htmlFor="password" className="block text-gray-700 text-sm font-bold mb-2">
-                Password
+                Mot de passe
               </label>
                 <input
-                type="text"
+                type="password"
                 name="password"
                 id="password"
                 autoComplete="password"
@@ -145,10 +142,10 @@ export default function Register() {
             </div>
             <div className="mb-6">
               <label htmlFor="repeat-password" className="block text-gray-700 text-sm font-bold mb-2">
-                Repeat password
+                Répéter le mot de passe
               </label>
                 <input
-                type="text"
+                type="password"
                 name="repeat-password"
                 id="repeat-password"
                 autoComplete="repeat-password"
@@ -157,11 +154,11 @@ export default function Register() {
                 />
             </div>
             <div className="flex items-center justify-between">
-              <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
-                Register
+              <button id='registerBtn' className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={checkRegister}>
+                Enregistrer
               </button>
               <a className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800" href="/login">
-                Home
+                Connexion
               </a>
             </div>
           </form >
@@ -178,3 +175,90 @@ export default function Register() {
   );
 }
 
+function checkRegister(event: { preventDefault: () => void; }){
+  let isCheck = true;
+  const email = document.getElementById("email") as HTMLInputElement;
+  const phone = document.getElementById("phone") as HTMLInputElement;
+  const firstname = document.getElementById("firstname") as HTMLInputElement;
+  const lastname = document.getElementById("lastname") as HTMLInputElement;
+  const password = document.getElementById("password") as HTMLInputElement;
+  const repeatPassword = document.getElementById("repeat-password") as HTMLInputElement;
+
+  //avoid sql injection 
+  //email
+  if(email.value.includes("'")){
+    email.value = email.value.replace("'","''")
+  }
+  //phone
+  if(phone.value.includes("'")){
+    phone.value = phone.value.replace("'","''")
+  }
+  //firstname
+  if(firstname.value.includes("'")){
+    firstname.value = firstname.value.replace("'","''")
+  }
+  //lastname
+  if(lastname.value.includes("'")){
+    lastname.value = lastname.value.replace("'","''")
+  }
+  //password
+  if(password.value.includes("'")){
+    password.value = password.value.replace("'","''")
+  }
+  //repeatPassword
+  if(repeatPassword.value.includes("'")){
+    repeatPassword.value = repeatPassword.value.replace("'","''")
+  }
+
+  //email is not true
+  if(!email.value.includes("@") || email.value == ""){
+    email.classList.add("border-red-500");
+    alert("L'email est incorrect")
+    isCheck = false;
+  }else{
+    email.classList.remove("border-red-500");
+  }
+  //phone is not true
+  if(phone.value.length != 10 || phone.value == ""){
+    alert("Le téléphone est incorrect")
+    isCheck = false;
+    phone.classList.add("border-red-500");
+  }else{
+    phone.classList.remove("border-red-500");
+  }
+  //firstname is not true
+  if(firstname.value == ""){
+    alert("Le prénom est incorrect")
+    isCheck = false;
+    firstname.classList.add("border-red-500");
+  }else{
+    firstname.classList.remove("border-red-500");
+  }
+  //lastname is not true
+  if(lastname.value == ""){
+    alert("Le nom est incorrect")
+    isCheck = false;
+    lastname.classList.add("border-red-500");
+  }else{
+    lastname.classList.remove("border-red-500");
+  }
+  //password is not true
+  if(password.value.length < 5 || password.value != repeatPassword.value){
+    alert("Les mots de passes sont incorrects")
+    isCheck = false;
+    password.classList.add("border-red-500");
+    repeatPassword.classList.add("border-red-500");
+  }else{
+    password.classList.remove("border-red-500");
+    repeatPassword.classList.remove("border-red-500");
+  }
+
+  //submit form if isCheck is true 
+  const form = document.getElementById("registerBtn") as HTMLFormElement;
+
+  if (isCheck) {
+    alert("Vous êtes bien enregistré")
+  }else{
+    event.preventDefault();
+  }
+}
