@@ -26,31 +26,31 @@ export let action: ActionFunction = async ({request}) => {
   let lastname = formData.get('lastname')?.toString()
   let password = formData.get('password')?.toString()
   let repeatpassword = formData.get('repeat-password')?.toString()
-    let formObj = Object.fromEntries(formData.entries())
-    const hashedPassword = hashPassword(password);
-    console.table(formObj)
-    const data = {
-      data: {
-        name: firstname,
-        email: email,
-        phone: phone,
-        password: hashedPassword,
-        companyName: null,
-        siret: null,
-        ape: null,
-        address: null,
-        bankAccountOwner: null,
-        bankDomiciliation: null,
-        bankRib: null,
-        bankIban: null,
-        bankBic: null,
-        githubId: "null",
-        createdAt: new Date(),
-      },
-    };
+  let formObj = Object.fromEntries(formData.entries())
+  const hashedPassword = hashPassword(password);
+  const data = {
+    data: {
+      name: firstname,
+      email: email,
+      phone: phone,
+      password: hashedPassword,
+      companyName: null,
+      siret: null,
+      ape: null,
+      address: null,
+      bankAccountOwner: null,
+      bankDomiciliation: null,
+      bankRib: null,
+      bankIban: null,
+      bankBic: null,
+      githubId: "null",
+      createdAt: new Date(),
+    },
+  };
     
-    await prisma.user.create(data);
-  }
+  await prisma.user.create(data);
+  return json({ success: true }, { status: 302, headers: { Location: '/' } })
+}
 
 function hashPassword(password: string | undefined): string | undefined {
   const saltRounds = 10;
@@ -72,7 +72,7 @@ export default function Register() {
       <div className="flex flex-1 flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
         <div className="mx-auto w-full max-w-sm lg:w-96">
           <div className="flex justify-center">
-            <h2 className="mt-6 text-3xl font-bold tracking-tight text-gray-900">GME register</h2>
+            <h2 className="mt-6 text-3xl font-bold tracking-tight text-gray-900">GME Inscription</h2>
           </div>
           <form method="post" id="registerForm" className="px-8 pt-6 pb-8 mb-4">    
             <div className="mb-4">                
@@ -158,7 +158,7 @@ export default function Register() {
                 Enregistrer
               </button>
               <a className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800" href="/login">
-                Connexion
+                Vous avez un compte ?
               </a>
             </div>
           </form >

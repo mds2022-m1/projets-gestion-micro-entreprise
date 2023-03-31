@@ -1,8 +1,10 @@
 import { Form } from '@remix-run/react';
-import React from 'react';
-import type { LoaderFunction } from '@remix-run/node';
+import React, { useState } from 'react';
+import type { ActionFunction, LoaderFunction } from '@remix-run/node';
 import { authenticator } from '~/server/auth.server';
 import { SocialsProvider } from 'remix-auth-socials';
+import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs'
 
 // eslint-disable-next-line max-len
 export const loader: LoaderFunction = async ({ request }) => {
@@ -14,15 +16,61 @@ export const loader: LoaderFunction = async ({ request }) => {
   );
   return { user };
 };
+export let action: ActionFunction = async ({request}) => {
+  // On récupère les données du formulaire
+  let formData = await request.formData();
+  const prisma = new PrismaClient();
+
+  // Ici, formData est un dictionnaire clé/valeur
+  // Il est possible d'accéder à nos données avec :
+  let email = formData.get('email')?.toString();
+  let password = formData.get('password')?.toString();
+  
+  const user = await prisma.user.findFirst({
+    where: {
+      email: email,
+    },
+  });
+
+  const hashedPassword = user?.password;
+
+  if (password && hashedPassword) {
+    bcrypt.compare(password, hashedPassword, function(err, result) {
+      if (err) {
+        // Gérer l'erreur
+        console.log("erreur")
+      } else if (result === true) {
+        // Le mot de passe est correct
+        console.log("Vous êtes connecté !")
+      } else {
+        // Le mot de passe est incorrect
+        console.log("Mot de passe incorrect !")
+      }
+    });
+  } else {
+    console.log("Password or hashed password is undefined");
+  }
+
+  return {
+    redirect: '/login',
+  };
+};
+
+
 export default function Login() {
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleTogglePassword = () => {
+    setShowPassword(!showPassword);
+  };
   return (
     <div className="flex min-h-screen">
       <div className="flex flex-1 flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
         <div className="mx-auto w-full max-w-sm lg:w-96">
           <div className="flex justify-center">
-            <h2 className="mt-6 text-3xl font-bold tracking-tight text-gray-900">GME login</h2>
+            <h2 className="mt-6 text-3xl font-bold tracking-tight text-gray-900">GME Connexion</h2>
           </div>
-          <form action="get" className="px-8 pt-6 pb-8 mb-4">    
+          <form action='/login' method="post" id="connexionForm" className="px-8 pt-6 pb-8 mb-4">     
             <div className="mb-4">                
               <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">
                 Email
@@ -38,10 +86,10 @@ export default function Login() {
             </div>
             <div className="mb-6">
               <label htmlFor="password" className="block text-gray-700 text-sm font-bold mb-2">
-                Password
+                Mot de passe
               </label>
                 <input
-                type="text"
+                type="password"
                 name="password"
                 id="password"
                 autoComplete="password"
@@ -51,10 +99,10 @@ export default function Login() {
             </div>
             <div className="flex items-center justify-between">
               <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
-                Sign In
+                Connexion
               </button>
               <a className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800" href="/register">
-                Not register ?
+                Pas de compte ?
               </a>
             </div>
           </form>
@@ -95,3 +143,4 @@ export default function Login() {
     </div>
   );
 }
+
