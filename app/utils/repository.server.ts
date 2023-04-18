@@ -25,6 +25,10 @@ export async function getAllOrganizationType(): Promise<OrganizationType[]> {
   return db.organizationType.findMany();
 }
 
+export async function findOrganizationType(id: string): Promise<OrganizationType | null> {
+  return db.organizationType.findUnique({ where: { id } });
+}
+
 // eslint-disable-next-line max-len
 export async function createOrganizationType(organizationTypeDTO: OrganizationTypeDTO): Promise<OrganizationType> {
   return db.organizationType.create({
@@ -54,11 +58,11 @@ export async function deleteOrganizationType(id: string): Promise<void> {
 }
 
 export async function getAllOrganization(): Promise<Organization[]> {
-  return db.organization.findMany();
+  return db.organization.findMany({ include: { organizationType: true } });
 }
 
 export async function findOrganization(id: string): Promise<Organization | null> {
-  return db.organization.findUnique({ where: { id } });
+  return db.organization.findUnique({ where: { id }, include: { organizationType: true } });
 }
 
 export async function createOrganization(organizationDTO: OrganizationDTO): Promise<Organization> {
@@ -93,6 +97,6 @@ export async function updateOrganization(organizationDTO: OrganizationDTO): Prom
   });
 }
 
-export async function deleteOrganization(id: string): Promise<void> {
-  await db.organization.delete({ where: { id } });
+export async function deleteOrganization(id: string): Promise<Organization> {
+  return db.organization.delete({ where: { id } });
 }

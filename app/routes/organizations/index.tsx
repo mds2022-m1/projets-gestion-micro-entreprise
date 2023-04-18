@@ -21,23 +21,17 @@ export default function Posts() {
       </div>
       <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {organizations.map((org) => (
-          <li
-            key={org.id}
-            className="col-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow min-w-[15rem]"
-          >
+          <li key={org.id} className="col-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow min-w-[15rem]">
             <div className="flex w-full items-center justify-between space-x-6 p-6">
               <div className="flex-1 truncate">
                 <div className="flex items-center space-x-3">
-                  <h3 className="truncate text-sm font-medium text-gray-900">
-                    {org.name}
-                  </h3>
+                  <h3 className="truncate text-sm font-medium text-gray-900">{org.name}</h3>
                   <span className="inline-block flex-shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
-                    {org.organizationTypeId}
+                    {/* @ts-ignore */}
+                    {org.organizationType.name}
                   </span>
                 </div>
-                <p className="mt-1 truncate text-sm text-gray-500">
-                  {org.address}
-                </p>
+                <p className="mt-1 truncate text-sm text-gray-500">{org.address}</p>
               </div>
               <img
                 className="h-10 w-10 flex-shrink-0 rounded-full bg-gray-300"
