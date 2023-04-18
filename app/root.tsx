@@ -6,7 +6,7 @@ import {
   Outlet,
   Scripts,
   // eslint-disable-next-line @typescript-eslint/comma-dangle
-  ScrollRestoration
+  ScrollRestoration,
 } from '@remix-run/react';
 import { useEffect, useState } from 'react';
 import { Sidebar } from './components/Sidebar';
@@ -45,7 +45,7 @@ export default function App() {
         <div className={login ? 'hidden' : ''}>
           <Sidebar />
         </div>
-        <div className={login ? '' : 'lg:pl-64 flex flex-col justify-center items-center w-full h-screen'}>
+        <div className={login ? '' : 'lg:pl-64 w-full h-screen'}>
           <Outlet />
         </div>
         <ScrollRestoration />

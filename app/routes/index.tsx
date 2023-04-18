@@ -12,7 +12,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 export default function Index() {
   return (
-    <div className="lg:ml-64 h-screen flex flex-col justify-center items-center">
+    <div className="h-screen flex flex-col justify-center items-center">
       Bonjour
     </div>
   );
