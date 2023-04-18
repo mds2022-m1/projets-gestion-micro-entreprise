@@ -1,75 +1,63 @@
 /* eslint-disable @typescript-eslint/comma-dangle */
-import type { LoaderArgs } from '@remix-run/node';
-import { useLoaderData } from '@remix-run/react';
-import { findOrganization } from '~/utils/repository.server';
+import type { LoaderArgs, DataFunctionArgs } from '@remix-run/node';
+import {
+  Form,
+  useLoaderData, useTransition
+} from '@remix-run/react';
+import { deleteOrganization, findOrganization } from '~/utils/repository.server';
 
 import { PaperClipIcon } from '@heroicons/react/20/solid';
+import React, { useRef, useState } from 'react';
+import { AlertBox } from '~/components/AlertBox';
+import { delay } from '~/utils/functions';
+import { redirect } from '@remix-run/node';
 
 const attachments = [
   { name: 'resume_front_end_developer.pdf', href: '#' },
   { name: 'coverletter_front_end_developer.pdf', href: '#' },
 ];
-// const eventTypes = {
-//   applied: { icon: UserIcon, bgColorClass: 'bg-gray-400' },
-//   advanced: { icon: HandThumbUpIcon, bgColorClass: 'bg-blue-500' },
-//   completed: { icon: CheckIcon, bgColorClass: 'bg-green-500' },
-// };
-// const timeline = [
-//   {
-//     id: 1,
-//     type: eventTypes.applied,
-//     content: 'Applied to',
-//     target: 'Front End Developer',
-//     date: 'Sep 20',
-//     datetime: '2020-09-20',
-//   },
-//   {
-//     id: 2,
-//     type: eventTypes.advanced,
-//     content: 'Advanced to phone screening by',
-//     target: 'Bethany Blake',
-//     date: 'Sep 22',
-//     datetime: '2020-09-22',
-//   },
-//   {
-//     id: 3,
-//     type: eventTypes.completed,
-//     content: 'Completed phone screening with',
-//     target: 'Martha Gardner',
-//     date: 'Sep 28',
-//     datetime: '2020-09-28',
-//   },
-//   {
-//     id: 4,
-//     type: eventTypes.advanced,
-//     content: 'Advanced to interview by',
-//     target: 'Bethany Blake',
-//     date: 'Sep 30',
-//     datetime: '2020-09-30',
-//   },
-//   {
-//     id: 5,
-//     type: eventTypes.completed,
-//     content: 'Completed interview with',
-//     target: 'Katherine Snyder',
-//     date: 'Oct 4',
-//     datetime: '2020-10-04',
-//   },
-// ];
-
-// function classNames(...classes: string[]) {
-//   return classes.filter(Boolean).join(' ');
-// }
 
 export const loader = async ({ params }: LoaderArgs) => {
   const organization = await findOrganization(params.organization!);
   return organization;
 };
 
+export const action = async ({
+  params
+}: DataFunctionArgs) => {
+  if (params.organization) {
+    await deleteOrganization(params.organization);
+  }
+  await delay(500);
+  return redirect('/organizations');
+};
+
 export default function OrganizationDetail() {
   const organization = useLoaderData<typeof loader>();
+  const [showAlertDelete, setShowAlertDelete] = useState<boolean>(false);
+  const cancelButtonRef = useRef(null);
+
+  const transition = useTransition();
+
   return (
     <main className="py-10 w-full h-full">
+      <AlertBox
+        open={showAlertDelete}
+        setOpen={setShowAlertDelete}
+        cancelRef={cancelButtonRef}
+        title={"Supprimer l'organisation"}
+        message="Êtes-vous sûr de vouloir supprimer cette organisation? Cette action est irreversible."
+        actionButton={(
+          <Form method="delete">
+            <button
+              type="submit"
+              className="inline-flex w-full justify-center rounded-md border border-transparent bg-red-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
+            >
+              {transition.state === 'loading' ? 'Suppression ...' : 'Supprimer'}
+            </button>
+          </Form>
+        )}
+      />
       {/* Page header */}
       <div className="mx-auto max-w-3xl px-4 sm:px-6 md:flex md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
         <div className="flex items-center space-x-5">
@@ -91,15 +79,18 @@ export default function OrganizationDetail() {
           </div>
         </div>
         <div className="justify-stretch mt-6 flex flex-col-reverse space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-y-0 sm:space-x-3 sm:space-x-reverse md:mt-0 md:flex-row md:space-x-3">
-          <button
-            type="button"
-            className="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-100"
-          >
-            Modifier
-          </button>
+          <a href={`/organizations/${organization?.id}/edit`}>
+            <button
+              type="button"
+              className="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-100"
+            >
+              Modifier
+            </button>
+          </a>
           <button
             type="button"
             className="inline-flex items-center justify-center rounded-md border border-transparent bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-100"
+            onClick={() => setShowAlertDelete(true)}
           >
             Supprimer
           </button>
@@ -172,13 +163,13 @@ export default function OrganizationDetail() {
                   </div>
                 </dl>
               </div>
-              <div>
+              {/* <div>
                 <p
                   className="block bg-gray-50 px-4 py-4 text-center text-sm font-medium text-gray-500 hover:text-gray-700 sm:rounded-b-lg"
                 >
                   Read full application
                 </p>
-              </div>
+              </div> */}
             </div>
           </section>
         </div>

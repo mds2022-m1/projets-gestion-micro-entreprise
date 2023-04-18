@@ -50,11 +50,11 @@ model Organization {
     address String
     siret String
     organizationTypeId String
-    OrganizationType OrganizationType @relation(fields: [organizationTypeId], references: [id])
+    organizationType OrganizationType @relation(fields: [organizationTypeId], references: [id])
     userId String
-    User User @relation(fields: [userId], references: [id])
-    Mission Mission[]
-    Contribution Contribution[]
+    user User @relation(fields: [userId], references: [id])
+    missions Mission[]
+    contributions Contribution[]
     createdAt DateTime @default(now())
 }
 
