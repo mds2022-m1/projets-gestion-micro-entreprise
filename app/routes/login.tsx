@@ -7,6 +7,7 @@ import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs'
 import { ReactSession } from 'react-client-session';
 
+
 // eslint-disable-next-line max-len
 export const loader: LoaderFunction = async ({ request }) => {
   const user = ReactSession.get("user");
@@ -33,8 +34,9 @@ export let action: ActionFunction = async ({ request }) => {
   });
 
   const hashedPassword = user?.password;
+  
 
-  if (password && hashedPassword) {
+  if (email && password && hashedPassword) {
     try {
       const match = await bcrypt.compare(password, hashedPassword);
       if (match) {
@@ -48,7 +50,7 @@ export let action: ActionFunction = async ({ request }) => {
       console.error(err);
     }
   } else {
-    console.log("Le mot de passe est incorrect !");
+    console.log("Veuillez renseignez les champs !");
   }
 
   return {
@@ -71,7 +73,7 @@ export default function Login() {
           <div className="flex justify-center">
             <h2 className="mt-6 text-3xl font-bold tracking-tight text-gray-900">GME Connexion</h2>
           </div>
-          <form action='/login' method="post" id="connexionForm" className="px-8 pt-6 pb-8 mb-4">     
+          <form method="post" id="connexionForm" className="px-8 pt-6 pb-8 mb-4">     
             <div className="mb-4">                
               <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">
                 Email
@@ -99,7 +101,7 @@ export default function Login() {
                 />
             </div>
             <div className="flex items-center justify-between">
-              <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+              <button id="loginBtn" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={checkLogin}>
                 Connexion
               </button>
               <a className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800" href="/register">
@@ -145,3 +147,37 @@ export default function Login() {
   );
 }
 
+async function checkLogin(event: { preventDefault: () => void; }) {
+  let isCheck = true;
+  const email = document.getElementById("email") as HTMLInputElement;
+  const password = document.getElementById("password") as HTMLInputElement;
+
+  if(email.value.includes("'")){
+    email.value = email.value.replace("'","''")
+  }
+  if(password.value.includes("'")){
+    password.value = password.value.replace("'","''")
+  }
+
+  //email is not true
+  if(!email.value.includes("@") || email.value == ""){
+    email.classList.add("border-red-500");
+    isCheck = false;
+  }else{
+    email.classList.remove("border-red-500");
+  }
+
+  if(password.value == ""){ 
+    isCheck = false;
+    password.classList.add("border-red-500");
+  }else{
+    password.classList.remove("border-red-500");
+  }
+
+  //submit form if isCheck is true 
+  const form = document.getElementById("loginBtn") as HTMLFormElement;
+
+  if (!isCheck) {
+    event.preventDefault();
+  }
+}
