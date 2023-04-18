@@ -1,22 +1,22 @@
 import { Form } from '@remix-run/react';
 import React, { useState } from 'react';
-import type { ActionFunction, LoaderFunction } from '@remix-run/node';
+import { ActionFunction, LoaderFunction, redirect } from '@remix-run/node';
 import { authenticator } from '~/server/auth.server';
 import { SocialsProvider } from 'remix-auth-socials';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs'
+import { ReactSession } from 'react-client-session';
 
 // eslint-disable-next-line max-len
 export const loader: LoaderFunction = async ({ request }) => {
-  const user = await authenticator.isAuthenticated(
-    request,
-    {
-      successRedirect: '/',
-    },
-  );
+  const user = ReactSession.get("user");
+  if(user){
+    return redirect("/");
+  }
+  console.log('login', user);
   return { user };
 };
-export let action: ActionFunction = async ({request}) => {
+export let action: ActionFunction = async ({ request }) => {
   // On récupère les données du formulaire
   let formData = await request.formData();
   const prisma = new PrismaClient();
@@ -25,7 +25,7 @@ export let action: ActionFunction = async ({request}) => {
   // Il est possible d'accéder à nos données avec :
   let email = formData.get('email')?.toString();
   let password = formData.get('password')?.toString();
-  
+
   const user = await prisma.user.findFirst({
     where: {
       email: email,
@@ -35,26 +35,27 @@ export let action: ActionFunction = async ({request}) => {
   const hashedPassword = user?.password;
 
   if (password && hashedPassword) {
-    bcrypt.compare(password, hashedPassword, function(err, result) {
-      if (err) {
-        // Gérer l'erreur
-        console.log("erreur")
-      } else if (result === true) {
-        // Le mot de passe est correct
-        console.log("Vous êtes connecté !")
+    try {
+      const match = await bcrypt.compare(password, hashedPassword);
+      if (match) {
+        ReactSession.set("user",user);
+        console.log("Vous êtes connecté !" + user.name);
+        return redirect("/login");
       } else {
-        // Le mot de passe est incorrect
-        console.log("Mot de passe incorrect !")
+        console.log("Mot de passe incorrect !");
       }
-    });
+    } catch (err) {
+      console.error(err);
+    }
   } else {
-    console.log("Password or hashed password is undefined");
+    console.log("Le mot de passe est incorrect !");
   }
 
   return {
     redirect: '/login',
   };
 };
+
 
 
 export default function Login() {

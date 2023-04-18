@@ -1,13 +1,14 @@
 // ./app/routes/index.tsx
 import { Form, useLoaderData } from '@remix-run/react';
-import type { LoaderFunction } from '@remix-run/node';
+import { ActionFunction, LoaderFunction, redirect } from '@remix-run/node';
 import { authenticator } from '~/server/auth.server';
+import { ReactSession } from 'react-client-session';
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const user = await authenticator.isAuthenticated(request, {
-    failureRedirect: '/login',
-  });
-
+  const user = ReactSession.get("user");
+  if(!user){
+    return redirect("/login");
+  }
   console.log('index', user);
   return { user };
 };
