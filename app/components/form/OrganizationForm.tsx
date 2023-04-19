@@ -11,15 +11,16 @@ type OrganizationFormProps = {
   validator: Validator<any>,
   organizationTypes: Omit<OrganizationType, 'createdAt'>[],
   organization?: Omit<Organization, 'createdAt'>,
-  onCancel: Function
+  onCancel: Function,
+  onSubmit?: any,
 };
 export function OrganizationForm({
-  id, method, validator, organizationTypes, organization, onCancel,
+  id, method, validator, organizationTypes, organization, onCancel, onSubmit,
 }: OrganizationFormProps) {
   const organizationTypeIdError = useField('organizationTypeId', { formId: 'form-new-organization' }).error;
 
   return (
-    <ValidatedForm id={id} validator={validator} className="space-y-8 divide-y divide-gray-200" method={method}>
+    <ValidatedForm id={id} validator={validator} className="space-y-8 divide-y divide-gray-200" method={method} onSubmit={onSubmit}>
       <div className="space-y-8 divide-y divide-gray-200">
         <div className="pt-8">
           <div>

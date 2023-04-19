@@ -1,18 +1,43 @@
-import { EnvelopeIcon, PhoneIcon } from '@heroicons/react/20/solid';
 import { Link, useLoaderData } from '@remix-run/react';
 import { getAllOrganization } from '~/utils/repository.server';
+import { gql, useQuery } from '@apollo/client';
 
 export const loader = async () => {
-  const organizations = await getAllOrganization();
-  return organizations;
+  // const organizations = await getAllOrganization();
+  // return organizations;
 };
 
+const ORGANIZATIONS_QUERY = gql`
+  query GetOrganizations {
+    organizations {
+      id
+      name
+      reference
+      email
+      phone
+      address
+      siret
+      organization_type_id
+      user_id
+      organization_type {
+          id,
+          name
+      }
+    }
+  }
+`;
+
 export default function Posts() {
-  const organizations = useLoaderData<typeof loader>();
+  // const organizations = useLoaderData<typeof loader>();
+  const { data } = useQuery(ORGANIZATIONS_QUERY, {
+    fetchPolicy: 'cache-and-network',
+    nextFetchPolicy: 'cache-first',
+  });
+
   return (
     <div>
       <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {organizations.map((org) => (
+        {data && data.organizations.map((org: any) => (
           <li key={org.id} className="col-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow min-w-[15rem]">
             <div className="flex w-full items-center justify-between space-x-6 p-6">
               <div className="flex-1 truncate">
@@ -20,7 +45,7 @@ export default function Posts() {
                   <h3 className="truncate text-sm font-medium text-gray-900">{org.name}</h3>
                   <span className="inline-block flex-shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
                     {/* @ts-ignore */}
-                    {org.organizationType.name}
+                    {org.organization_type.name}
                   </span>
                 </div>
                 <p className="mt-1 truncate text-sm text-gray-500">{org.address}</p>

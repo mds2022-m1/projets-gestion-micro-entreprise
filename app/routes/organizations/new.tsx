@@ -1,10 +1,9 @@
-import type { DataFunctionArgs, Session } from '@remix-run/node';
+import type { DataFunctionArgs, LoaderArgs, Session } from '@remix-run/node';
 import { getSession } from '~/utils/session.server';
 import type { User, OrganizationType } from '@prisma/client';
 import {
   createOrganization,
   findOrganizationType,
-  getAllOrganizationType,
 } from '~/utils/repository.server';
 import { redirect } from '@remix-run/node';
 import { validationError } from 'remix-validated-form';
@@ -13,6 +12,7 @@ import { z } from 'zod';
 import { delay } from '~/utils/functions';
 import { useLoaderData, useNavigate } from '@remix-run/react';
 import { OrganizationForm } from '~/components/form/OrganizationForm';
+import { gql, useMutation } from '@apollo/client';
 
 export const loader = async () => {
   const organizationTypes = await getAllOrganizationType();
@@ -82,10 +82,65 @@ export const action = async ({
   return redirect('/organizations');
 };
 
+const CREATE_ORGANIZATION = gql`
+  mutation CreateOrganization($object: organizations_insert_input!) {
+  insert_organizations_one(object: $object) {
+    id
+      name
+      reference
+      email
+      phone
+      address
+      siret
+      organization_type_id
+      user_id
+      organization_type {
+          id,
+          name
+      }
+  }
+}
+`;
+
 export default function NewOrganization() {
   const organizationTypes = useLoaderData<typeof loader>();
 
-  const navigation = useNavigate();
+  const navigate = useNavigate();
+
+  const [createOrganizationMutation] = useMutation(CREATE_ORGANIZATION);
+
+  const handleCreateOrganization = async (formData: FormData, event: SubmitEvent) => {
+    event.preventDefault();
+    const result = await validator.validate(
+      await formData,
+    );
+
+    if (result.error) {
+      // validationError comes from `remix-validated-form`
+      return validationError(result.error);
+    }
+
+    const {
+      name, reference, email, phone, address, siret, organizationTypeId,
+    } = result.data;
+
+    await createOrganizationMutation({
+      variables: {
+        object: {
+          name,
+          reference,
+          email,
+          phone,
+          address,
+          siret,
+          organization_type_id: organizationTypeId,
+          user_id: 'd15e2f06-de86-11ed-b5ea-0242ac120002',
+        },
+      },
+    });
+
+    navigate('/organizations');
+  };
 
   return (
     <div className="lg:ml-64 flex flex-col justify-center items-center">
@@ -94,7 +149,8 @@ export default function NewOrganization() {
         method="post"
         validator={validator}
         organizationTypes={organizationTypes}
-        onCancel={() => navigation('/organizations')}
+        onCancel={() => navigate('/organizations')}
+        onSubmit={(data: any, event: any) => handleCreateOrganization(data, event)}
       />
     </div>
   );
