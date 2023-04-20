@@ -12,3 +12,5 @@ node_modules
 
 .idea
 /app/tailwind.css
+app/.DS_Store
+.DS_Store

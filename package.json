@@ -11,6 +11,8 @@
     "lint:fix": "yarn lint --fix"
   },
   "dependencies": {
+    "@headlessui/react": "^1.7.4",
+    "@heroicons/react": "^2.0.13",
     "@prisma/client": "^4.6.1",
     "@remix-run/node": "^1.7.6",
     "@remix-run/react": "^1.7.6",

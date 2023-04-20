@@ -17,6 +17,7 @@ export const loader: LoaderFunction = async ({ request }) => {
   console.log('login', user);
   return { user };
 };
+
 export let action: ActionFunction = async ({ request }) => {
   // On récupère les données du formulaire
   let formData = await request.formData();
