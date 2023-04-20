@@ -1,27 +1,116 @@
 import { Form } from '@remix-run/react';
-import React from 'react';
-import type { LoaderFunction } from '@remix-run/node';
+import React, { useState } from 'react';
+import { ActionFunction, LoaderFunction, redirect } from '@remix-run/node';
 import { authenticator } from '~/server/auth.server';
 import { SocialsProvider } from 'remix-auth-socials';
+import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs'
+import { ReactSession } from 'react-client-session';
+
 
 // eslint-disable-next-line max-len
 export const loader: LoaderFunction = async ({ request }) => {
-  const user = await authenticator.isAuthenticated(
-    request,
-    {
-      successRedirect: '/',
-    },
-  );
+  const user = ReactSession.get("user");
+  if(user){
+    return redirect("/");
+  }
+  console.log('login', user);
   return { user };
 };
+
+export let action: ActionFunction = async ({ request }) => {
+  // On récupère les données du formulaire
+  let formData = await request.formData();
+  const prisma = new PrismaClient();
+
+  // Ici, formData est un dictionnaire clé/valeur
+  // Il est possible d'accéder à nos données avec :
+  let email = formData.get('email')?.toString();
+  let password = formData.get('password')?.toString();
+
+  const user = await prisma.user.findFirst({
+    where: {
+      email: email,
+    },
+  });
+
+  const hashedPassword = user?.password;
+  
+
+  if (email && password && hashedPassword) {
+    try {
+      const match = await bcrypt.compare(password, hashedPassword);
+      if (match) {
+        ReactSession.set("user",user);
+        console.log("Vous êtes connecté !" + user.name);
+        return redirect("/login");
+      } else {
+        console.log("Mot de passe incorrect !");
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  } else {
+    console.log("Veuillez renseignez les champs !");
+  }
+
+  return {
+    redirect: '/login',
+  };
+};
+
+
+
 export default function Login() {
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleTogglePassword = () => {
+    setShowPassword(!showPassword);
+  };
   return (
     <div className="flex min-h-screen">
       <div className="flex flex-1 flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
         <div className="mx-auto w-full max-w-sm lg:w-96">
           <div className="flex justify-center">
-            <h2 className="mt-6 text-3xl font-bold tracking-tight text-gray-900">GME</h2>
+            <h2 className="mt-6 text-3xl font-bold tracking-tight text-gray-900">GME Connexion</h2>
           </div>
+          <form method="post" id="connexionForm" className="px-8 pt-6 pb-8 mb-4">     
+            <div className="mb-4">                
+              <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">
+                Email
+              </label>
+              <input
+              type="text"
+              name="email"
+              id="email"
+              autoComplete="email"
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              placeholder='exemple@gmail.com'
+              />
+            </div>
+            <div className="mb-6">
+              <label htmlFor="password" className="block text-gray-700 text-sm font-bold mb-2">
+                Mot de passe
+              </label>
+                <input
+                type="password"
+                name="password"
+                id="password"
+                autoComplete="password"
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                placeholder='********'
+                />
+            </div>
+            <div className="flex items-center justify-between">
+              <button id="loginBtn" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" onClick={checkLogin}>
+                Connexion
+              </button>
+              <a className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800" href="/register">
+                Pas de compte ?
+              </a>
+            </div>
+          </form>
+          <hr></hr>
 
           <div className="mt-8">
             <div>
@@ -57,4 +146,39 @@ export default function Login() {
       </div>
     </div>
   );
+}
+
+async function checkLogin(event: { preventDefault: () => void; }) {
+  let isCheck = true;
+  const email = document.getElementById("email") as HTMLInputElement;
+  const password = document.getElementById("password") as HTMLInputElement;
+
+  if(email.value.includes("'")){
+    email.value = email.value.replace("'","''")
+  }
+  if(password.value.includes("'")){
+    password.value = password.value.replace("'","''")
+  }
+
+  //email is not true
+  if(!email.value.includes("@") || email.value == ""){
+    email.classList.add("border-red-500");
+    isCheck = false;
+  }else{
+    email.classList.remove("border-red-500");
+  }
+
+  if(password.value == ""){ 
+    isCheck = false;
+    password.classList.add("border-red-500");
+  }else{
+    password.classList.remove("border-red-500");
+  }
+
+  //submit form if isCheck is true 
+  const form = document.getElementById("loginBtn") as HTMLFormElement;
+
+  if (!isCheck) {
+    event.preventDefault();
+  }
 }

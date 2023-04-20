@@ -7,6 +7,12 @@ export async function getAllOrganizations(): Promise<Organization[]> {
   return db.organization.findMany();
 }
 
+//create a new User
+export async function createOrganization(data: User): Promise<User> {
+  return db.user.create({ data });
+}
+
+
 export async function getUserByGithubId(githubId: string): Promise<User | null> {
   return db.user.findUnique({
     where: { githubId },
