@@ -2,6 +2,7 @@
 import { Form, useLoaderData } from '@remix-run/react';
 import { ActionFunction, LoaderFunction, redirect } from '@remix-run/node';
 import { authenticator } from '~/server/auth.server';
+import { Sidebar } from '../components/Sidebar';
 import { ReactSession } from 'react-client-session';
 
 export const loader: LoaderFunction = async ({ request }) => {
@@ -15,8 +16,9 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 export default function Index() {
   const { user } = useLoaderData();
+  
   return (
-    <div className="lg:ml-64 h-screen bg-slate-700 flex flex-col justify-center items-center">
+  <><Sidebar /><div className="lg:ml-64 h-screen bg-slate-700 flex flex-col justify-center items-center">
       <h2 className="text-blue-600 font-extrabold text-5xl">TailwindCSS Is Working!</h2>
       <p>
         Hello
@@ -27,6 +29,6 @@ export default function Index() {
       <Form action="/logout" method="post">
         <button type="submit">Logout</button>
       </Form>
-    </div>
+    </div></>
   );
 }

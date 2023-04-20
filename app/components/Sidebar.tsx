@@ -18,7 +18,7 @@ const navigation = [
 ];
 const secondaryNavigation = [
   { name: 'Compte', href: '/account', icon: UserIcon },
-  { name: 'Déconnexion', href: '#', icon: ArrowLeftOnRectangleIcon },
+  { name: 'Déconnexion', href: '/logout', icon: ArrowLeftOnRectangleIcon },
 ];
 
 function classNames(...classes: string[]) {
