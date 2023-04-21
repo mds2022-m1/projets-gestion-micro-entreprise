@@ -5,9 +5,11 @@ import {
   Meta,
   Outlet,
   Scripts,
+  // eslint-disable-next-line @typescript-eslint/comma-dangle
   ScrollRestoration,
 } from '@remix-run/react';
-//import { Sidebar } from './components/Sidebar';
+import { useEffect, useState } from 'react';
+import { Sidebar } from './components/Sidebar';
 import styles from './tailwind.css';
 
 export function links() {
@@ -20,7 +22,19 @@ export const meta: MetaFunction = () => ({
   viewport: 'width=device-width,initial-scale=1',
 });
 
+// eslint-disable-next-line import/no-default-export
 export default function App() {
+  const [login, setLogin] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const { pathname } = window.location;
+      if (pathname === '/login') {
+        setLogin(true);
+      } else setLogin(false);
+    }
+  }, []);
+
   return (
     <html lang="en">
       <head>
@@ -28,7 +42,12 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <Outlet />
+        <div className={login ? 'hidden' : ''}>
+          <Sidebar />
+        </div>
+        <div className={login ? '' : 'lg:pl-64 w-full h-screen'}>
+          <Outlet />
+        </div>
         <ScrollRestoration />
         <Scripts />
         <LiveReload />

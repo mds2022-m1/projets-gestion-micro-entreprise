@@ -11,22 +11,25 @@ datasource db {
 }
 
 model User {
-  id String @id @default(uuid())
-  name String
-  email String?
-  phone String?
-  password String?
-  companyName String?
-  siret String?
-  ape String?
-  address String?
-  bankAccountOwner String?
-  bankDomiciliation String?
-  bankRib String?
-  bankIban String?
-  bankBic String?
-  githubId String?
-  createdAt DateTime @default(now()) @db.Date
+    id String @id @default(uuid())
+    name String
+    email String?
+    phone String?
+    password String?
+    companyName String?
+    siret String?
+    ape String?
+    address String?
+    bankAccountOwner String?
+    bankDomiciliation String?
+    bankRib String?
+    bankIban String?
+    bankBic String?
+    githubId String @unique
+    OrganizationType OrganizationType[]
+    Organization Organization[]
+    Mission Mission[]
+    createdAt DateTime @default(now()) @db.Date
 }
 
 
@@ -35,7 +38,9 @@ model OrganizationType {
     name String
     color String
     Organization Organization[]
-    createdAt DateTime @default(now()) @db.Date
+    userId String
+    User User @relation(fields: [userId], references: [id])
+    createdAt DateTime @default(now())
 }
 
 model Organization {
@@ -47,10 +52,12 @@ model Organization {
     address String
     siret String
     organizationTypeId String
-    OrganizationType OrganizationType @relation(fields: [organizationTypeId], references: [id])
-    Mission Mission[]
-    Contribution Contribution[]
-    createdAt DateTime @default(now()) @db.Date
+    organizationType OrganizationType @relation(fields: [organizationTypeId], references: [id])
+    userId String
+    user User @relation(fields: [userId], references: [id])
+    missions Mission[]
+    contributions Contribution[]
+    createdAt DateTime @default(now())
 }
 
 model Mission {
@@ -61,9 +68,11 @@ model Mission {
     deposit Int
     organizationId String
     Organization Organization @relation(fields: [organizationId], references: [id])
+    userId String
+    user User @relation(fields: [userId], references: [id])
     MissionLine MissionLine[]
-    billedAt DateTime? @db.Date
-    createdAt DateTime @default(now()) @db.Date
+    billedAt DateTime?
+    createdAt DateTime @default(now())
 }
 
 model MissionLine {
@@ -74,7 +83,7 @@ model MissionLine {
     unit String
     missionId String
     Mission Mission @relation(fields: [missionId], references: [id])
-    createdAt DateTime @default(now()) @db.Date
+    createdAt DateTime @default(now())
 }
 
 model Contribution {
@@ -84,7 +93,7 @@ model Contribution {
     price Int
     organizationId String
     Organization Organization @relation(fields: [organizationId], references: [id])
-    createdAt DateTime @default(now()) @db.Date
+    createdAt DateTime @default(now())
 }
 
 model Transaction {
@@ -92,6 +101,6 @@ model Transaction {
     sourceType String
     sourceId String
     price Int
-    paidAt DateTime? @db.Date
-    createdAt DateTime @default(now()) @db.Date
+    paidAt DateTime?
+    createdAt DateTime @default(now())
 }

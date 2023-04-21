@@ -1,6 +1,7 @@
 // ./app/routes/index.tsx
 import { Form, useLoaderData } from '@remix-run/react';
 import { ActionFunction, LoaderFunction, redirect } from '@remix-run/node';
+import type { LoaderFunction } from '@remix-run/node';
 import { authenticator } from '~/server/auth.server';
 import { Sidebar } from '../components/Sidebar';
 import { ReactSession } from 'react-client-session';
@@ -15,6 +16,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 };
 
 export default function Index() {
+<<<<<<< HEAD
   const { user } = useLoaderData();
   
   return (
@@ -30,5 +32,11 @@ export default function Index() {
         <button type="submit">Logout</button>
       </Form>
     </div></>
+=======
+  return (
+    <div className="h-screen flex flex-col justify-center items-center">
+      Bonjour
+    </div>
+>>>>>>> feature/missions
   );
 }

@@ -1,7 +1,7 @@
 import { Authenticator } from 'remix-auth';
 import { GitHubStrategy, SocialsProvider } from 'remix-auth-socials';
 import { sessionStorage } from '~/utils/session.server';
-import { findOrCreateUserFromGithubProfile } from '~/utils/repository';
+import { findOrCreateUserFromGithubProfile } from '~/utils/repository.server';
 import type { User } from '@prisma/client';
 
 // Create an instance of the authenticator
