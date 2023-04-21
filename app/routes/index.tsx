@@ -1,42 +1,21 @@
 // ./app/routes/index.tsx
-import { Form, useLoaderData } from '@remix-run/react';
-import { ActionFunction, LoaderFunction, redirect } from '@remix-run/node';
+import { redirect } from '@remix-run/node';
 import type { LoaderFunction } from '@remix-run/node';
-import { authenticator } from '~/server/auth.server';
-import { Sidebar } from '../components/Sidebar';
 import { ReactSession } from 'react-client-session';
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const user = ReactSession.get("user");
-  if(!user){
-    return redirect("/login");
+  const user = ReactSession.get('user');
+  if (!user) {
+    return redirect('/login');
   }
   console.log('index', user);
   return { user };
 };
 
 export default function Index() {
-<<<<<<< HEAD
-  const { user } = useLoaderData();
-  
-  return (
-  <><Sidebar /><div className="lg:ml-64 h-screen bg-slate-700 flex flex-col justify-center items-center">
-      <h2 className="text-blue-600 font-extrabold text-5xl">TailwindCSS Is Working!</h2>
-      <p>
-        Hello
-        {' '}
-        {' '}
-        {user.name}
-      </p>
-      <Form action="/logout" method="post">
-        <button type="submit">Logout</button>
-      </Form>
-    </div></>
-=======
   return (
     <div className="h-screen flex flex-col justify-center items-center">
       Bonjour
     </div>
->>>>>>> feature/missions
   );
 }
