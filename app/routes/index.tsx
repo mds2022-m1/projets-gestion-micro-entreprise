@@ -1,13 +1,13 @@
+// ./app/routes/index.tsx
 import type { LoaderFunction } from '@remix-run/node';
 import { authenticator } from '~/server/auth.server';
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const user = await authenticator.isAuthenticated(request, {
+  await authenticator.isAuthenticated(request, {
     failureRedirect: '/login',
   });
 
-  console.log('index', user);
-  return { user };
+  return { };
 };
 
 export default function Index() {

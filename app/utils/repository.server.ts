@@ -4,7 +4,7 @@ import type {
 } from '@prisma/client';
 import { db } from '~/utils/db.server';
 import type {
-  MissionDTO, MissionLineDTO, OrganizationDTO, OrganizationTypeDTO,
+  MissionDTO, MissionLineDTO, OrganizationDTO, OrganizationTypeDTO, UserDTO,
 } from '~/utils/types';
 import type { GitHubProfile } from 'remix-auth-socials';
 
@@ -26,6 +26,25 @@ export const findOrCreateUserFromGithubProfile = async (profile: GitHubProfile):
     },
   });
 };
+
+export const createUserFromCredentials = async (userDTO: UserDTO): Promise<User> => db.user.create({
+  data: {
+    name: userDTO.name,
+    email: userDTO.email,
+    phone: userDTO.phone,
+    password: userDTO.password,
+  },
+});
+
+export async function findUser(email:string): Promise<User | null> {
+  return db.user.findUnique({ where: { email } });
+}
+
+export async function loginUser(email:string): Promise<User> {
+  // @ts-ignore
+  return db.user.findUnique({ where: { email } })!;
+}
+
 export async function getAllOrganizationType(): Promise<OrganizationType[]> {
   return db.organizationType.findMany();
 }

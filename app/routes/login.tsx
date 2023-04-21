@@ -1,33 +1,156 @@
 import { Form } from '@remix-run/react';
-import React from 'react';
-import type { LoaderFunction } from '@remix-run/node';
-import { authenticator } from '~/server/auth.server';
+import React, { useState } from 'react';
+import type { ActionFunction, LoaderFunction } from '@remix-run/node';
 import { SocialsProvider } from 'remix-auth-socials';
+import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
+import { authenticator } from '~/server/auth.server';
+import { findUser } from '~/utils/repository.server';
+import { useField, ValidatedForm, validationError } from 'remix-validated-form';
+import { withZod } from '@remix-validated-form/with-zod';
+import { z } from 'zod';
 
 // eslint-disable-next-line max-len
 export const loader: LoaderFunction = async ({ request }) => {
-  const user = await authenticator.isAuthenticated(
-    request,
-    {
-      successRedirect: '/',
-    },
-  );
-  return { user };
+  await authenticator.isAuthenticated(request, {
+    successRedirect: '/',
+  });
+
+  return { };
 };
+
+function hashPassword(password: string | undefined): string | undefined {
+  if (!password) return undefined;
+
+  return bcrypt.hashSync(password, 10);
+}
+
+export const validator = withZod(
+  z.object({
+    email: z
+      .string({ required_error: 'L\'email est requis ' })
+      .email({ message: 'Le format de l\'email est invalide' }),
+    password: z
+      .string({ required_error: 'Le mot de passe est requis' })
+      .min(8, { message: 'Le mot de passe doit faire au minimum 8 caractères' }),
+  }),
+);
+
+export const action: ActionFunction = async ({ request }) => {
+  // On récupère les données du formulaire
+  const result = await validator.validate(
+    await request.formData(),
+  );
+
+  if (result.error) {
+    // validationError comes from `remix-validated-form`
+    return validationError(result.error);
+  }
+
+  // Ici, formData est un dictionnaire clé/valeur
+  // Il est possible d'accéder à nos données avec :
+  const {
+    email, password,
+  } = result.data;
+
+  const user = await findUser(email);
+
+  if (!user) {
+    return validationError({
+      formId: 'form-login',
+      fieldErrors: { password: 'Email ou mot de passe incorrect' },
+    });
+  }
+
+  const hashedPassword = hashPassword(password);
+
+  if (email && password && hashedPassword) {
+    try {
+      const match = await bcrypt.compare(password, hashedPassword);
+      if (match) {
+        console.log('Mot de passe correct !');
+
+        await authenticator.authenticate('user-pass', request, {
+          successRedirect: '/',
+          failureRedirect: '/login',
+        });
+      }
+      console.log('Mot de passe incorrect !');
+    } catch (err) {
+      console.error(err);
+    }
+  } else {
+    console.log('Veuillez renseignez les champs !');
+  }
+
+  return {};
+};
+
 export default function Login() {
+  const [showPassword, setShowPassword] = useState(false);
+
+  const email = useField('email', { formId: 'form-login' });
+  const password = useField('password', { formId: 'form-login' });
+
+  const handleTogglePassword = () => {
+    setShowPassword(!showPassword);
+  };
   return (
     <div className="flex min-h-screen">
       <div className="flex flex-1 flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
         <div className="mx-auto w-full max-w-sm lg:w-96">
           <div className="flex justify-center">
-            <h2 className="mt-6 text-3xl font-bold tracking-tight text-gray-900">GME</h2>
+            <h2 className="mt-6 text-3xl font-bold tracking-tight text-gray-900">GME Connexion</h2>
           </div>
+          <ValidatedForm id="form-login" validator={validator} method="POST">
+            <div className="mb-4">
+              <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">
+                Email
+              </label>
+              <input
+                type="text"
+                name="email"
+                id="email"
+                autoComplete="email"
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                placeholder="exemple@gmail.com"
+              />
+              {email.error && (
+              <span className="text-red-600">{email.error}</span>
+              )}
+            </div>
+            <div className="mb-6">
+              <label htmlFor="password" className="block text-gray-700 text-sm font-bold mb-2">
+                Mot de passe
+              </label>
+              <input
+                type="password"
+                name="password"
+                id="password"
+                autoComplete="password"
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                placeholder="********"
+              />
+              {password.error && (
+              <span className="text-red-600">{password.error}</span>
+              )}
+            </div>
+            <div className="flex items-center justify-between">
+              <button id="loginBtn" type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                Connexion
+              </button>
+              <a className="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800" href="/register">
+                Pas de compte ?
+              </a>
+            </div>
+          </ValidatedForm>
+          <hr />
 
           <div className="mt-8">
             <div>
               <div>
                 <div className="mt-1 grid grid-cols-1 gap-3">
-                  <Form action={`/auth/${SocialsProvider.GITHUB}`} method="post">
+                  <Form id="form-login-github" action={`/auth/${SocialsProvider.GITHUB}`} method="post">
                     <button
                       type="submit"
                       className="inline-flex w-full justify-center rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-500 shadow-sm hover:bg-gray-50"
@@ -57,4 +180,39 @@ export default function Login() {
       </div>
     </div>
   );
+}
+
+async function checkLogin(event: { preventDefault: () => void; }) {
+  let isCheck = true;
+  const email = document.getElementById('email') as HTMLInputElement;
+  const password = document.getElementById('password') as HTMLInputElement;
+
+  if (email.value.includes("'")) {
+    email.value = email.value.replace("'", "''");
+  }
+  if (password.value.includes("'")) {
+    password.value = password.value.replace("'", "''");
+  }
+
+  // email is not true
+  if (!email.value.includes('@') || email.value == '') {
+    email.classList.add('border-red-500');
+    isCheck = false;
+  } else {
+    email.classList.remove('border-red-500');
+  }
+
+  if (password.value == '') {
+    isCheck = false;
+    password.classList.add('border-red-500');
+  } else {
+    password.classList.remove('border-red-500');
+  }
+
+  // submit form if isCheck is true
+  const form = document.getElementById('loginBtn') as HTMLFormElement;
+
+  if (!isCheck) {
+    event.preventDefault();
+  }
 }

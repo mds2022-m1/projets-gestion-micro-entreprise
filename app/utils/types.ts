@@ -2,6 +2,24 @@ import type {
   OrganizationType, User, Organization, Mission,
 } from '@prisma/client';
 
+export type UserDTO = {
+  id?:string,
+  name: string,
+  email: string,
+  phone: string,
+  password?: string,
+  companyName?: string,
+  siret?: string,
+  ape?: string,
+  address?: string,
+  bankAccountOwner?: string,
+  bankDomiciliation?: string,
+  bankRib?: string,
+  bankIban?: string,
+  bankBic?: string,
+  githubId?: string,
+};
+
 export type OrganizationTypeDTO = {
   id?: string,
   name: string,
@@ -39,21 +57,4 @@ export type MissionLineDTO = {
   price: number,
   unit: string,
   missionId: string
-};
-
-export type UserDTO = {
-  name: string,
-  email?: string,
-  phone?: string,
-  password?: string,
-  companyName?: string,
-  siret?: string,
-  ape?: string,
-  address?: string,
-  bankAccountOwner?: string,
-  bankDomiciliation?: string,
-  bankRib?: string,
-  bankIban?: string,
-  bankBic?: string,
-  githubId: string
 };

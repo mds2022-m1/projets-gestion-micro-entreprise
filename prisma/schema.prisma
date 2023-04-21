@@ -13,7 +13,7 @@ datasource db {
 model User {
     id String @id @default(uuid())
     name String
-    email String?
+    email String? @unique
     phone String?
     password String?
     companyName String?
@@ -25,12 +25,13 @@ model User {
     bankRib String?
     bankIban String?
     bankBic String?
-    githubId String @unique
+    githubId String? @unique
     OrganizationType OrganizationType[]
     Organization Organization[]
     Mission Mission[]
     createdAt DateTime @default(now()) @db.Date
 }
+
 
 model OrganizationType {
     id String @id @default(uuid())
