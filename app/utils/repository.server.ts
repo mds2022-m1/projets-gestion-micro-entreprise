@@ -137,11 +137,12 @@ export async function updateMission(missionDTO: MissionDTO): Promise<Mission> {
       comment: missionDTO.comment,
       deposit: missionDTO.deposit,
       organizationId: missionDTO.organization.id,
-      billedAt: missionDTO.billedAt,
+      billedAt: missionDTO.billedAt ? new Date(missionDTO.billedAt) : null,
     },
   });
 }
 
 export async function deleteMission(id: string): Promise<Mission> {
+  await db.missionLine.deleteMany({ where: { missionId: id } });
   return db.mission.delete({ where: { id } });
 }

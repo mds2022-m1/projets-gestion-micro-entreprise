@@ -10,7 +10,16 @@ type MissionFormProps = {
   method: FormMethod,
   validator: Validator<any>,
   organizations: Omit<Organization, 'createdAt'>[],
-  mission?: Omit<Mission, 'createdAt'>,
+  mission?: {
+    id: string
+    reference: string
+    title: string
+    comment: string | null
+    deposit: number
+    organizationId: string
+    userId: string
+    billedAt: string | null
+  },
   onCancel: Function
 };
 export function MissionForm({
@@ -36,7 +45,7 @@ export function MissionForm({
               <FormInput id="comment" name="comment" type="text" label="Commentaire" defaultValue={mission?.comment ?? undefined} />
             </div>
             <div className="sm:col-span-4">
-              <FormInput id="billedAt" name="billedAt" type="date" label="Facturation le" defaultValue={mission?.billedAt?.toLocaleDateString() ?? undefined} />
+              <FormInput id="billedAt" name="billedAt" type="date" label="Facturation le" defaultValue={mission?.billedAt ?? undefined} />
             </div>
             <div className="sm:col-span-4">
               <label htmlFor="organizationId" className="block text-sm font-medium text-gray-700">

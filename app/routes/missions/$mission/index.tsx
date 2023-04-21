@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/comma-dangle */
-import type { LoaderArgs } from '@remix-run/node';
-import { useLoaderData } from '@remix-run/react';
-import { findMission } from '~/utils/repository.server';
+import type { LoaderArgs, DataFunctionArgs } from '@remix-run/node';
+import { Form, useLoaderData, useTransition } from '@remix-run/react';
+import { deleteMission, deleteOrganization, findMission } from '~/utils/repository.server';
 
 import {
   CurrencyEuroIcon, DocumentIcon, PencilIcon, TrashIcon
@@ -9,18 +9,54 @@ import {
 import type { MissionLine } from '@prisma/client';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { Link } from 'react-router-dom';
+import React, { useRef, useState } from 'react';
+import { AlertBox } from '~/components/AlertBox';
+import { redirect } from '@remix-run/node';
+import { delay } from '~/utils/functions';
 
 export const loader = async ({ params }: LoaderArgs) => {
   const mission = await findMission(params.mission!);
   return mission;
 };
 
+export const action = async ({
+  params
+}: DataFunctionArgs) => {
+  if (params.mission) {
+    await deleteMission(params.mission);
+  }
+  await delay(500);
+  return redirect('/missions');
+};
+
 export default function MissionDetail() {
   const mission = useLoaderData<typeof loader>();
-  // @ts-ignore
+
+  const [showAlertDelete, setShowAlertDelete] = useState<boolean>(false);
+  const cancelButtonRef = useRef(null);
+
+  const transition = useTransition();
+
   // @ts-ignore
   return (
     <main className="py-10 w-full h-full">
+      <AlertBox
+        open={showAlertDelete}
+        setOpen={setShowAlertDelete}
+        cancelRef={cancelButtonRef}
+        title="Supprimer la mission"
+        message="Êtes-vous sûr de vouloir supprimer cette mission? Cette action est irreversible."
+        actionButton={(
+          <Form method="delete">
+            <button
+              type="submit"
+              className="inline-flex w-full justify-center rounded-md border border-transparent bg-red-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
+            >
+              {transition.state === 'loading' ? 'Suppression ...' : 'Supprimer'}
+            </button>
+          </Form>
+          )}
+      />
       {/* Page header */}
       <div className="mx-auto max-w-3xl px-4 sm:px-6 md:flex md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
         <div className="flex items-center space-x-5">
@@ -45,15 +81,19 @@ export default function MissionDetail() {
           </div>
         </div>
         <div className="justify-stretch mt-6 flex flex-col-reverse space-y-4 space-y-reverse sm:flex-row-reverse sm:justify-end sm:space-y-0 sm:space-x-3 sm:space-x-reverse md:mt-0 md:flex-row md:space-x-3">
-          <button
-            type="button"
-            className="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-100"
-          >
-            Modifier
-          </button>
+          <a href={`/missions/${mission?.id}/edit`}>
+            <button
+              type="button"
+              className="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-100"
+            >
+              Modifier
+            </button>
+          </a>
+
           <button
             type="button"
             className="inline-flex items-center justify-center rounded-md border border-transparent bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-100"
+            onClick={() => setShowAlertDelete(true)}
           >
             Supprimer
           </button>

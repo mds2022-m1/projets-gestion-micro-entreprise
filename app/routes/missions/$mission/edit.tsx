@@ -1,10 +1,10 @@
-import type { DataFunctionArgs, Session } from '@remix-run/node';
+import type { DataFunctionArgs, Session, LoaderArgs } from '@remix-run/node';
 import { getSession } from '~/utils/session.server';
 import type { User, Organization } from '@prisma/client';
 import {
-  createMission,
+  createMission, findMission,
   findOrganization,
-  getAllOrganization,
+  getAllOrganization, updateMission,
 } from '~/utils/repository.server';
 import { redirect } from '@remix-run/node';
 import { validationError } from 'remix-validated-form';
@@ -14,9 +14,13 @@ import { delay } from '~/utils/functions';
 import { useLoaderData, useNavigate } from '@remix-run/react';
 import { MissionForm } from '~/components/form/MissionForm';
 
-export const loader = async () => {
+export const loader = async ({ params }: LoaderArgs) => {
   const organizations = await getAllOrganization();
-  return organizations;
+  const mission = await findMission(params.mission!);
+  return {
+    organizations,
+    mission,
+  };
 };
 
 export const validator = withZod(
@@ -60,32 +64,34 @@ export const action = async ({
   const organization: Organization | null = await findOrganization(organizationId);
   if (!organization) {
     return validationError({
-      formId: 'form-new-mission',
+      formId: 'form-update-mission',
       fieldErrors: { organization: 'Organisation introuvable' },
     });
   }
 
-  const mission = await createMission({
-    title, reference, comment, deposit: 1, organization, billedAt, user,
+  await updateMission({
+    id: params.mission, title, reference, comment, deposit: 1, organization, billedAt, user,
   });
 
   await delay(500);
 
-  return redirect(`/missions/${mission.id}`);
+  return redirect(`/missions/${params.mission}`);
 };
 
-export default function NewMission() {
-  const organizations = useLoaderData<typeof loader>();
+export default function EditMission() {
+  const { organizations } = useLoaderData<typeof loader>();
+  const { mission } = useLoaderData<typeof loader>();
 
   const navigation = useNavigate();
 
   return (
     <div className="lg:ml-64 flex flex-col justify-center items-center">
       <MissionForm
-        id="form-new-mission"
+        id="form-update-mission"
         method="post"
         validator={validator}
         organizations={organizations}
+        mission={mission ?? undefined}
         onCancel={() => navigation('/missions')}
       />
     </div>
