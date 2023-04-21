@@ -10,9 +10,9 @@ import { ReactSession } from 'react-client-session';
 // eslint-disable-next-line max-len
 export const loader: LoaderFunction = async ({ request }) => {
   const user = ReactSession.get('user');
-  if (user) {
-    return redirect('/');
-  }
+  // if (user) {
+  //   return redirect('/');
+  // }
   console.log('login', user);
   return { user };
 };
