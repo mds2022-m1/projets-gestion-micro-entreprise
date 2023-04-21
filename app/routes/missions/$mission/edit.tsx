@@ -92,7 +92,7 @@ export default function EditMission() {
         validator={validator}
         organizations={organizations}
         mission={mission ?? undefined}
-        onCancel={() => navigation('/missions')}
+        onCancel={() => navigation(`/missions/${mission?.id}`)}
       />
     </div>
   );

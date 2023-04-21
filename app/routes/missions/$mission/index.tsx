@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/comma-dangle */
 import type { LoaderArgs, DataFunctionArgs } from '@remix-run/node';
 import { Form, useLoaderData, useTransition } from '@remix-run/react';
-import { deleteMission, deleteOrganization, findMission } from '~/utils/repository.server';
+import { deleteMission, deleteMissionLine, findMission } from '~/utils/repository.server';
 
 import {
   CurrencyEuroIcon, DocumentIcon, PencilIcon, TrashIcon
@@ -20,13 +20,26 @@ export const loader = async ({ params }: LoaderArgs) => {
 };
 
 export const action = async ({
-  params
+  request,
+  params,
 }: DataFunctionArgs) => {
-  if (params.mission) {
-    await deleteMission(params.mission);
+  const formaData = await request.formData();
+
+  if (formaData.get('action')?.toString() === 'delete-mission') {
+    if (params.mission) {
+      await deleteMission(params.mission);
+      await delay(500);
+      return redirect('/missions');
+    }
+  } else if (formaData.get('action')?.toString().includes('delete.mission.line')) {
+    const actionSplit = formaData.get('action')?.toString().split('.');
+    const id: string | undefined = actionSplit ? actionSplit[actionSplit.length - 1] : undefined;
+    if (id) {
+      await deleteMissionLine(id);
+    }
   }
-  await delay(500);
-  return redirect('/missions');
+
+  return redirect(`/missions/${params.mission}`);
 };
 
 export default function MissionDetail() {
@@ -49,6 +62,8 @@ export default function MissionDetail() {
         actionButton={(
           <Form method="delete">
             <button
+              name="action"
+              value="delete-mission"
               type="submit"
               className="inline-flex w-full justify-center rounded-md border border-transparent bg-red-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
             >
@@ -154,7 +169,7 @@ export default function MissionDetail() {
                         Détail
                       </dt>
                       <Link
-                        to="/missions/lines/new"
+                        to={`/missions/${mission?.id}/lines`}
                         className="bg-cyan-700 text-white px-4 py-1.5 rounded-md text-xs"
                       >
                         Ajouter
@@ -180,25 +195,31 @@ export default function MissionDetail() {
                               </div>
                               <div className="flex ml-4 flex-shrink-0">
                                 {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-                                <a
-                                  href="#"
-                                  className="font-medium text-blue-600 hover:text-blue-500"
-                                >
-                                  <PencilIcon
-                                    className="h-4 w-4 flex-shrink-0 text-gray-400 mr-2"
-                                    aria-hidden="true"
-                                  />
-                                </a>
+                                <Link to={`/missions/${mission.id}/lines/${line.id}`}>
+                                  <button
+                                    type="button"
+                                    className="font-medium text-blue-600 hover:text-blue-500"
+                                  >
+                                    <PencilIcon
+                                      className="h-4 w-4 flex-shrink-0 text-gray-400 mr-2"
+                                      aria-hidden="true"
+                                    />
+                                  </button>
+                                </Link>
                                 {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-                                <a
-                                  href="#"
-                                  className="font-medium text-blue-600 hover:text-blue-500"
-                                >
-                                  <TrashIcon
-                                    className="h-4 w-4 flex-shrink-0 text-gray-400 mr-2"
-                                    aria-hidden="true"
-                                  />
-                                </a>
+                                <Form method="DELETE">
+                                  <button
+                                    type="submit"
+                                    name="action"
+                                    value={`delete.mission.line.${line.id}`}
+                                    className="font-medium text-blue-600 hover:text-blue-500"
+                                  >
+                                    <TrashIcon
+                                      className="h-4 w-4 flex-shrink-0 text-gray-400 mr-2"
+                                      aria-hidden="true"
+                                    />
+                                  </button>
+                                </Form>
                               </div>
                             </div>
                             <div className="flex flex-col items-start w-full pl-6 text-xs">

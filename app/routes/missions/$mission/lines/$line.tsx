@@ -1,6 +1,6 @@
 import type { DataFunctionArgs, LoaderArgs } from '@remix-run/node';
 import {
-  createMissionLine, findMission,
+  createMissionLine, findMission, findMissionLine, updateMissionLine,
 
 } from '~/utils/repository.server';
 import { redirect } from '@remix-run/node';
@@ -13,7 +13,11 @@ import { MissionLineForm } from '~/components/form/MissionLineForm';
 
 export const loader = async ({ params }: LoaderArgs) => {
   const mission = await findMission(params.mission!);
-  return mission;
+  const missionLine = await findMissionLine(params.line!);
+  return {
+    mission,
+    missionLine,
+  };
 };
 
 export const validator = withZod(
@@ -50,9 +54,9 @@ export const action = async ({
     title, quantity, price, unit,
   } = result.data;
 
-  await createMissionLine({
+  await updateMissionLine({
     // eslint-disable-next-line max-len
-    title, quantity: parseInt(quantity, 10), price: parseFloat(price), unit, missionId: params.mission!,
+    id: params.line!, title, quantity: parseInt(quantity, 10), price: parseFloat(price), unit, missionId: params.mission!,
   });
 
   await delay(500);
@@ -61,7 +65,8 @@ export const action = async ({
 };
 
 export default function NewMissionLine() {
-  const mission = useLoaderData<typeof loader>();
+  const { mission } = useLoaderData<typeof loader>();
+  const { missionLine } = useLoaderData<typeof loader>();
 
   const navigation = useNavigate();
 
@@ -71,6 +76,7 @@ export default function NewMissionLine() {
         id="form-new-mission-line"
         method="post"
         validator={validator}
+        missionLine={missionLine ?? undefined}
         onCancel={() => navigation(`/missions/${mission?.id}`)}
       />
     </div>

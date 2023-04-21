@@ -1,8 +1,11 @@
 import type {
   Organization, OrganizationType, Mission, User,
+  MissionLine,
 } from '@prisma/client';
 import { db } from '~/utils/db.server';
-import type { MissionDTO, OrganizationDTO, OrganizationTypeDTO } from '~/utils/types';
+import type {
+  MissionDTO, MissionLineDTO, OrganizationDTO, OrganizationTypeDTO,
+} from '~/utils/types';
 import type { GitHubProfile } from 'remix-auth-socials';
 
 export const findOrCreateUserFromGithubProfile = async (profile: GitHubProfile): Promise<User> => {
@@ -145,4 +148,39 @@ export async function updateMission(missionDTO: MissionDTO): Promise<Mission> {
 export async function deleteMission(id: string): Promise<Mission> {
   await db.missionLine.deleteMany({ where: { missionId: id } });
   return db.mission.delete({ where: { id } });
+}
+
+export async function findMissionLine(id: string): Promise<MissionLine | null> {
+  // eslint-disable-next-line max-len
+  return db.missionLine.findUnique({ where: { id } });
+}
+
+export async function createMissionLine(missionLineDTO: MissionLineDTO): Promise<MissionLine> {
+  return db.missionLine.create({
+    data: {
+      title: missionLineDTO.title,
+      quantity: missionLineDTO.quantity,
+      price: missionLineDTO.price * 100,
+      unit: missionLineDTO.unit,
+      missionId: missionLineDTO.missionId,
+    },
+  });
+}
+
+export async function updateMissionLine(missionLineDTO: MissionLineDTO): Promise<MissionLine> {
+  return db.missionLine.update({
+    where: {
+      id: missionLineDTO.id,
+    },
+    data: {
+      title: missionLineDTO.title,
+      quantity: missionLineDTO.quantity,
+      price: missionLineDTO.price * 100,
+      unit: missionLineDTO.unit,
+    },
+  });
+}
+
+export async function deleteMissionLine(id: string): Promise<MissionLine> {
+  return db.missionLine.delete({ where: { id } });
 }

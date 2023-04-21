@@ -3,7 +3,7 @@ import { useField } from 'remix-validated-form';
 type FormInputProps = {
   id: string,
   name: string,
-  type: 'text' | 'email' | 'color' | 'date',
+  type: 'text' | 'email' | 'color' | 'date' | 'number',
   label: string,
   value?: string,
   defaultValue?:string
