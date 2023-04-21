@@ -29,7 +29,7 @@ export default function App() {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const { pathname } = window.location;
-      if (pathname === '/login') {
+      if (pathname === '/login' || pathname === '/register') {
         setLogin(true);
       } else setLogin(false);
     }

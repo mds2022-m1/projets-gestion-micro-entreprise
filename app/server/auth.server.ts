@@ -1,7 +1,8 @@
 import { Authenticator } from 'remix-auth';
+import { FormStrategy } from 'remix-auth-form';
 import { GitHubStrategy, SocialsProvider } from 'remix-auth-socials';
 import { sessionStorage } from '~/utils/session.server';
-import { findOrCreateUserFromGithubProfile } from '~/utils/repository.server';
+import { findOrCreateUserFromGithubProfile, loginUser } from '~/utils/repository.server';
 import type { User } from '@prisma/client';
 
 // Create an instance of the authenticator
@@ -23,3 +24,11 @@ authenticator.use(new GitHubStrategy(
     return user;
   },
 ));
+
+authenticator.use(new FormStrategy(async ({ form }) => {
+  const email = form.get('email')!.toString();
+  const user = loginUser(email!.toString());
+  console.log('strategy', 'user-pass');
+  console.log('user', user);
+  return user;
+}), 'user-pass');
