@@ -1,22 +1,24 @@
 /* eslint-disable @typescript-eslint/comma-dangle */
 import type { LoaderArgs } from '@remix-run/node';
 import { useLoaderData } from '@remix-run/react';
-import { findOrganization } from '~/utils/repository.server';
+import { findMission } from '~/utils/repository.server';
 
-import { PaperClipIcon } from '@heroicons/react/20/solid';
-
-const attachments = [
-  { name: 'resume_front_end_developer.pdf', href: '#' },
-  { name: 'coverletter_front_end_developer.pdf', href: '#' },
-];
+import {
+  CurrencyEuroIcon, DocumentIcon, PencilIcon, TrashIcon
+} from '@heroicons/react/20/solid';
+import type { MissionLine } from '@prisma/client';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { Link } from 'react-router-dom';
 
 export const loader = async ({ params }: LoaderArgs) => {
-  const organization = await findOrganization(params.mission!);
-  return organization;
+  const mission = await findMission(params.mission!);
+  return mission;
 };
 
 export default function MissionDetail() {
-  const organization = useLoaderData<typeof loader>();
+  const mission = useLoaderData<typeof loader>();
+  // @ts-ignore
+  // @ts-ignore
   return (
     <main className="py-10 w-full h-full">
       {/* Page header */}
@@ -33,10 +35,11 @@ export default function MissionDetail() {
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">
-              {organization?.name}
+              {mission?.title}
             </h1>
             <p className="text-sm font-medium text-gray-500">
-              {organization?.address}
+              {/* @ts-ignore */}
+              {mission?.Organization.name}
               {/* <time dateTime="2020-08-25">August 25, 2020</time> */}
             </p>
           </div>
@@ -83,63 +86,96 @@ export default function MissionDetail() {
                       Référence
                     </dt>
                     <dd className="mt-1 text-sm text-gray-900">
-                      {organization?.reference}
+                      {mission?.reference ?? '-'}
                     </dd>
                   </div>
                   <div className="sm:col-span-1">
-                    <dt className="text-sm font-medium text-gray-500">Siret</dt>
+                    <dt className="text-sm font-medium text-gray-500">Prix</dt>
                     <dd className="mt-1 text-sm text-gray-900">
-                      {organization?.siret}
+                      {/* @ts-ignore */}
+                      { mission ? `${(mission?.MissionLine.reduce((accumulator: number, currentline: MissionLine) => accumulator + (currentline.quantity * currentline.price), 0) ?? 0) / 100}€` : '-'}
                     </dd>
                   </div>
                   <div className="sm:col-span-1">
-                    <dt className="text-sm font-medium text-gray-500">Email</dt>
+                    <dt className="text-sm font-medium text-gray-500">Facturé le</dt>
                     <dd className="mt-1 text-sm text-gray-900">
-                      {organization?.email}
-                    </dd>
-                  </div>
-                  <div className="sm:col-span-1">
-                    <dt className="text-sm font-medium text-gray-500">
-                      Téléphone
-                    </dt>
-                    <dd className="mt-1 text-sm text-gray-900">
-                      {organization?.phone}
+                      { mission?.billedAt ? new Date(mission.billedAt).toLocaleDateString(new Intl.Locale('fr')) : '-'}
                     </dd>
                   </div>
                   <div className="sm:col-span-2">
-                    <dt className="text-sm font-medium text-gray-500">About</dt>
+                    <dt className="text-sm font-medium text-gray-500">Description</dt>
                     <dd className="mt-1 text-sm text-gray-900">
-                      Fugiat ipsum ipsum deserunt culpa aute sint do nostrud
-                      anim incididunt cillum culpa consequat.
+                      {mission?.comment ?? '-'}
                     </dd>
                   </div>
                   <div className="sm:col-span-2">
-                    <dt className="text-sm font-medium text-gray-500">
-                      Attachments
-                    </dt>
+                    <div className="flex justify-between items-center w-full mb-4">
+                      <dt className="text-sm font-medium text-gray-500">
+                        Détail
+                      </dt>
+                      <Link
+                        to="/missions/lines/new"
+                        className="bg-cyan-700 text-white px-4 py-1.5 rounded-md text-xs"
+                      >
+                        Ajouter
+                      </Link>
+                    </div>
                     <dd className="mt-1 text-sm text-gray-900">
                       <ul className="divide-y divide-gray-200 rounded-md border border-gray-200">
-                        {attachments.map((attachment) => (
+                        {/* @ts-ignore */}
+                        {mission?.MissionLine.map((line: MissionLine) => (
                           <li
-                            key={attachment.name}
-                            className="flex items-center justify-between py-3 pl-3 pr-4 text-sm"
+                            key={line.id}
+                            className="flex flex-col items-center gap-y-2 py-3 pl-3 pr-4 text-sm"
                           >
-                            <div className="flex w-0 flex-1 items-center">
-                              <PaperClipIcon
-                                className="h-5 w-5 flex-shrink-0 text-gray-400"
-                                aria-hidden="true"
-                              />
-                              <span className="ml-2 w-0 flex-1 truncate">
-                                {attachment.name}
-                              </span>
+                            <div className="flex items-center justify-between w-full">
+                              <div className="flex w-0 flex-1 items-center">
+                                <DocumentIcon
+                                  className="h-5 w-5 flex-shrink-0 text-gray-400"
+                                  aria-hidden="true"
+                                />
+                                <span className="ml-2 w-0 flex-1 truncate">
+                                  {line.title}
+                                </span>
+                              </div>
+                              <div className="flex ml-4 flex-shrink-0">
+                                {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+                                <a
+                                  href="#"
+                                  className="font-medium text-blue-600 hover:text-blue-500"
+                                >
+                                  <PencilIcon
+                                    className="h-4 w-4 flex-shrink-0 text-gray-400 mr-2"
+                                    aria-hidden="true"
+                                  />
+                                </a>
+                                {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+                                <a
+                                  href="#"
+                                  className="font-medium text-blue-600 hover:text-blue-500"
+                                >
+                                  <TrashIcon
+                                    className="h-4 w-4 flex-shrink-0 text-gray-400 mr-2"
+                                    aria-hidden="true"
+                                  />
+                                </a>
+                              </div>
                             </div>
-                            <div className="ml-4 flex-shrink-0">
-                              <a
-                                href={attachment.href}
-                                className="font-medium text-blue-600 hover:text-blue-500"
-                              >
-                                Download
-                              </a>
+                            <div className="flex flex-col items-start w-full pl-6 text-xs">
+                              <div className="flex items-center justify-between">
+                                <CurrencyEuroIcon
+                                  className="h-4 w-4 flex-shrink-0 text-gray-400 mr-2"
+                                  aria-hidden="true"
+                                />
+                                <span>
+                                  {`${line.quantity + line.unit} * ${line.price / 100}€`}
+                                  {'  '}
+                                  =
+                                  {'  '}
+                                  { (line.quantity * line.price) / 100}
+                                  €
+                                </span>
+                              </div>
                             </div>
                           </li>
                         ))}
@@ -147,11 +183,6 @@ export default function MissionDetail() {
                     </dd>
                   </div>
                 </dl>
-              </div>
-              <div>
-                <p className="block bg-gray-50 px-4 py-4 text-center text-sm font-medium text-gray-500 hover:text-gray-700 sm:rounded-b-lg">
-                  Read full application
-                </p>
               </div>
             </div>
           </section>

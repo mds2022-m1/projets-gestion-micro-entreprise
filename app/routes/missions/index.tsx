@@ -1,41 +1,22 @@
 import {
   BuildingOffice2Icon,
   CalendarIcon,
-  MapPinIcon,
 } from '@heroicons/react/24/outline';
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { Link } from 'react-router-dom';
+import { getAllMissions } from '~/utils/repository.server';
+import { useLoaderData } from '@remix-run/react';
+
+export const loader = async () => {
+  const missions = await getAllMissions();
+  return missions;
+};
 
 export default function Missions() {
-  const missions = [
-    {
-      id: '0',
-      reference: 'ref0',
-      title: 'Mission0',
-      comment: '',
-      deposit: 1,
-      organizationId: 'MDS',
-      date: '15-12-2022',
-    },
-    {
-      id: '1',
-      reference: 'ref1',
-      title: 'Mission1',
-      comment: '',
-      deposit: 2,
-      organizationId: 'MDS',
-      date: '15-12-2022',
-    },
-    {
-      id: '2',
-      reference: 'ref2',
-      title: 'Mission2',
-      comment: '',
-      deposit: 3,
-      organizationId: 'MDS',
-      date: '15-12-2022',
-    },
-  ];
+  const missions = useLoaderData<typeof loader>();
 
+  // @ts-ignore
+  // @ts-ignore
   return (
     <div className="h-full w-full flex flex-col justify-start items-start p-6">
       <div className="w-full flex justify-between items-center mb-10">
@@ -50,17 +31,17 @@ export default function Missions() {
       <div className="w-full">
         <div className="overflow-hidden bg-white shadow sm:rounded-md">
           <ul className="divide-y divide-gray-200">
-            {missions.map((miss) => (
-              <li key={miss.id}>
-                <Link to={miss.id} className="block hover:bg-gray-50">
+            {missions.map((mission) => (
+              <li key={mission.id}>
+                <Link to={mission.id} className="block hover:bg-gray-50">
                   <div className="px-4 py-4 sm:px-6">
                     <div className="flex items-center justify-between">
                       <p className="truncate text-sm font-medium text-indigo-600">
-                        {miss.title}
+                        {mission.title}
                       </p>
                       <div className="ml-2 flex flex-shrink-0">
                         <p className="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800">
-                          {miss.reference}
+                          {mission.reference}
                         </p>
                       </div>
                     </div>
@@ -71,26 +52,36 @@ export default function Missions() {
                             className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                             aria-hidden="true"
                           />
-                          {miss.organizationId}
+                          {/* @ts-ignore */}
+                          {mission.Organization.name}
                         </p>
-                        <p className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-6">
+                        {/* eslint-disable-next-line max-len */}
+                        {/* <p className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-6">
                           <MapPinIcon
                             className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
                             aria-hidden="true"
                           />
-                          {miss.reference}
-                        </p>
+                          {mission.reference}
+                        </p> */}
                       </div>
-                      <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-                        <CalendarIcon
-                          className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
-                          aria-hidden="true"
-                        />
-                        <p>
-                          Closing on{' '}
-                          <time dateTime={miss.date}>{miss.date}</time>
-                        </p>
-                      </div>
+                      {mission.billedAt
+                          && (
+                          <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
+                            <CalendarIcon
+                              className="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400"
+                              aria-hidden="true"
+                            />
+                            <p>
+                              Facturé le
+                              {' '}
+                              <time
+                                dateTime={mission.billedAt}
+                              >
+                                {new Date(mission.billedAt).toLocaleDateString(new Intl.Locale('fr'))}
+                              </time>
+                            </p>
+                          </div>
+                          )}
                     </div>
                   </div>
                 </Link>

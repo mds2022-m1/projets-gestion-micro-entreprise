@@ -28,6 +28,7 @@ model User {
     githubId String @unique
     OrganizationType OrganizationType[]
     Organization Organization[]
+    Mission Mission[]
     createdAt DateTime @default(now()) @db.Date
 }
 
@@ -66,6 +67,8 @@ model Mission {
     deposit Int
     organizationId String
     Organization Organization @relation(fields: [organizationId], references: [id])
+    userId String
+    user User @relation(fields: [userId], references: [id])
     MissionLine MissionLine[]
     billedAt DateTime?
     createdAt DateTime @default(now())

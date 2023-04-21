@@ -1,6 +1,8 @@
-import type { Organization, OrganizationType, User } from '@prisma/client';
+import type {
+  Organization, OrganizationType, Mission, User,
+} from '@prisma/client';
 import { db } from '~/utils/db.server';
-import type { OrganizationDTO, OrganizationTypeDTO } from '~/utils/types';
+import type { MissionDTO, OrganizationDTO, OrganizationTypeDTO } from '~/utils/types';
 import type { GitHubProfile } from 'remix-auth-socials';
 
 export const findOrCreateUserFromGithubProfile = async (profile: GitHubProfile): Promise<User> => {
@@ -99,4 +101,47 @@ export async function updateOrganization(organizationDTO: OrganizationDTO): Prom
 
 export async function deleteOrganization(id: string): Promise<Organization> {
   return db.organization.delete({ where: { id } });
+}
+
+export async function getAllMissions(): Promise<Mission[]> {
+  return db.mission.findMany({ include: { Organization: true } });
+}
+
+export async function findMission(id: string): Promise<Mission | null> {
+  // eslint-disable-next-line max-len
+  return db.mission.findUnique({ where: { id }, include: { Organization: true, MissionLine: true } });
+}
+
+export async function createMission(missionDTO: MissionDTO): Promise<Mission> {
+  return db.mission.create({
+    data: {
+      title: missionDTO.title,
+      reference: missionDTO.reference,
+      comment: missionDTO.comment,
+      deposit: missionDTO.deposit,
+      organizationId: missionDTO.organization.id,
+      billedAt: missionDTO.billedAt ? new Date(missionDTO.billedAt) : null,
+      userId: missionDTO.user.id,
+    },
+  });
+}
+
+export async function updateMission(missionDTO: MissionDTO): Promise<Mission> {
+  return db.mission.update({
+    where: {
+      id: missionDTO.id,
+    },
+    data: {
+      title: missionDTO.title,
+      reference: missionDTO.reference,
+      comment: missionDTO.comment,
+      deposit: missionDTO.deposit,
+      organizationId: missionDTO.organization.id,
+      billedAt: missionDTO.billedAt,
+    },
+  });
+}
+
+export async function deleteMission(id: string): Promise<Mission> {
+  return db.mission.delete({ where: { id } });
 }

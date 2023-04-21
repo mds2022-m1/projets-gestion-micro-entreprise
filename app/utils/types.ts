@@ -1,4 +1,4 @@
-import type { OrganizationType, User } from '@prisma/client';
+import type { OrganizationType, User, Organization } from '@prisma/client';
 
 export type OrganizationTypeDTO = {
   id?: string,
@@ -18,6 +18,18 @@ export type OrganizationDTO = {
   organizationType: OrganizationType,
   user: User
 };
+
+export type MissionDTO = {
+  id?: string,
+  reference: string
+  title: string
+  comment: string | null
+  deposit: number
+  organization: Organization
+  billedAt: string | null
+  user: User
+};
+
 export type UserDTO = {
   name: string,
   email?: string,
