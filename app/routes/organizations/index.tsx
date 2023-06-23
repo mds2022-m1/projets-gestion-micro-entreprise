@@ -12,12 +12,20 @@ export default function Posts() {
     <div className="h-full w-full flex flex-col justify-start items-start p-6">
       <div className="w-full flex justify-between items-center mb-10">
         <h1 className="text-2xl font-medium">Organisations</h1>
-        <Link
-          to="/organizations/new"
-          className="bg-cyan-700 text-white px-6 py-2 rounded-lg"
-        >
-          Ajouter
-        </Link>
+        <div>
+          <Link
+            to="/organizations/types/new"
+            className="bg-cyan-700 text-white px-6 py-2 rounded-lg mr-5"
+          >
+            Ajouter un type d&apos;organisation
+          </Link>
+          <Link
+            to="/organizations/new"
+            className="bg-cyan-700 text-white px-6 py-2 rounded-lg"
+          >
+            Ajouter
+          </Link>
+        </div>
       </div>
       <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {organizations.map((org) => (
@@ -26,7 +34,7 @@ export default function Posts() {
               <div className="flex-1 truncate">
                 <div className="flex items-center space-x-3">
                   <h3 className="truncate text-sm font-medium text-gray-900">{org.name}</h3>
-                  <span className="inline-block flex-shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
+                  <span className="inline-block flex-shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-white" style={{ backgroundColor: org.organizationType.color }}>
                     {/* @ts-ignore */}
                     {org.organizationType.name}
                   </span>

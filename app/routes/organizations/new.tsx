@@ -1,12 +1,8 @@
 import type { DataFunctionArgs, Session } from '@remix-run/node';
-import { getSession } from '~/utils/session.server';
-import type { User, OrganizationType } from '@prisma/client';
-import {
-  createOrganization,
-  findOrganizationType,
-  getAllOrganizationType,
-} from '~/utils/repository.server';
 import { redirect } from '@remix-run/node';
+import { getSession } from '~/utils/session.server';
+import type { OrganizationType, User } from '@prisma/client';
+import { createOrganization, findOrganizationType, getAllOrganizationType } from '~/utils/repository.server';
 import { validationError } from 'remix-validated-form';
 import { withZod } from '@remix-validated-form/with-zod';
 import { z } from 'zod';
@@ -14,10 +10,7 @@ import { delay } from '~/utils/functions';
 import { useLoaderData, useNavigate } from '@remix-run/react';
 import { OrganizationForm } from '~/components/form/OrganizationForm';
 
-export const loader = async () => {
-  const organizationTypes = await getAllOrganizationType();
-  return organizationTypes;
-};
+export const loader = async () => getAllOrganizationType();
 
 export const validator = withZod(
   z.object({
