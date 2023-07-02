@@ -15,7 +15,7 @@ authenticator.use(new GitHubStrategy(
   {
     clientID: process.env.GITHUB_CLIENT_ID as string,
     clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
-    callbackURL: `http://localhost:3000/auth/${SocialsProvider.GITHUB}/callback`,
+    callbackURL: `${process.env.APP_URL}/auth/${SocialsProvider.GITHUB}/callback`,
     scope: ['read:user', 'user:email'],
   },
   async ({ profile }) => {

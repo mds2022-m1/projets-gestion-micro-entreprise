@@ -34,6 +34,7 @@ export default function Posts() {
               <div className="flex-1 truncate">
                 <div className="flex items-center space-x-3">
                   <h3 className="truncate text-sm font-medium text-gray-900">{org.name}</h3>
+                  {/* @ts-ignore */}
                   <span className="inline-block flex-shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-white" style={{ backgroundColor: org.organizationType.color }}>
                     {/* @ts-ignore */}
                     {org.organizationType.name}

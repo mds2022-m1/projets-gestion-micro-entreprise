@@ -1,36 +1,48 @@
-# Welcome to Remix!
+# 💼 Gestion micro-entreprise
 
-- [Remix Docs](https://remix.run/docs)
+## 📄 Description
 
-## Deployment
+Cette application permet de gérer sa micro-entreprise en créant des organisations pour lesquelles nous pouvons créer des missions pour facturer celles-ci et avoir un historique de notre activité.
 
-After having run the `create-remix` command and selected "Vercel" as a deployment target, you only need to [import your Git repository](https://vercel.com/new) into Vercel, and it will be deployed.
+## 🤖 Technos
 
-If you'd like to avoid using a Git repository, you can also deploy the directory by running [Vercel CLI](https://vercel.com/cli):
+Ce projet a été fait avec le framework Remix en TypeScript.
 
-```sh
-npm i -g vercel
-vercel
+* [Documentation Remix](https://remix.run/docs/en/main)
+* [Documentation TypeScript](https://www.typescriptlang.org/docs/handbook/typescript-in-5-minutes.html)
+
+## ⚙️ Démarrage
+
+### 🌱 Environnement
+
+Il faut tout d'abord créer une base de données.
+
+Ensuite, il faut créer le fichier d'environnement en tapant :
+
+```
+cp .env.example .env
 ```
 
-It is generally recommended to use a Git repository, because future commits will then automatically be deployed by Vercel, through its [Git Integration](https://vercel.com/docs/concepts/git).
+Modifiez la variable `DATABASE_URL` de votre fichier `.env` et mettez l'URL de votre base de données. Par défaut, il faut une base de données POSTGRES, cependant, vous pouvez changer cela en modifiant la variable `DATABASE_PROVIDER` (Les providers possibles sont : `postgresql`, `mysql`, `sqlite`, `sqlserver`, `mongodb`, `cockroachdb`)
 
-## Development
+Ensuite, il vous faut renseigner les secrets Github afin de faire fonctionner la connexion avec Github. Pour se faire allez dans les paramètres de Github pour enregistrer une nouvelle application OAuth (https://github.com/settings/developers). Une fois fait, récupérez le `Client ID` et générez un nouveau `Client secrets`. Copiez les valeurs et renseignez les dans le `.env` dans les champs `GITHUB_CLIENT_ID` et `GITHUB_CLIENT_SECRET`.
 
-To run your Remix app locally, make sure your project's local dependencies are installed:
+Pour finir, générez un token qui servira de secret pour l'authentification en session et renseignez le dans le `.env` dans la valeur `SECRET`.
 
-```sh
-npm install
+⚠️ Si vous lancez le projet sur autre chose que votre localhost, pensez bien à modifier l'URL dans l'application OAUth sur Github (https://github.com/settings/developers) et dans la variable `APP_URL`, auquel cas la connexion Github ne pourra pas fonctionner.
+
+### 🛠 Installation des dépendances
+
+À la racine du projet :
+
+```
+yarn install
 ```
 
-Afterwards, start the Remix development server like so:
+### 🔋 Lancement du projet
 
-```sh
-npm run dev
+```
+yarn dev
 ```
 
-Open up [http://localhost:3000](http://localhost:3000) and you should be ready to go!
-
-If you're used to using the `vercel dev` command provided by [Vercel CLI](https://vercel.com/cli) instead, you can also use that, but it's not needed.
-
-[![Open in Visual Studio Code](https://classroom.github.com/assets/open-in-vscode-c66648af7eb3fe8bc4f294546bfd86ef473780cde1dea487d3c4ff354943c9ae.svg)](https://classroom.github.com/online_ide?assignment_repo_id=9476578&assignment_repo_type=AssignmentRepo)
+L'application tournera maintenant sur le port `3000`. 🎉
